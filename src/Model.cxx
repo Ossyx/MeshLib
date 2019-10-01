@@ -1,3 +1,6 @@
+/**
+* Copyright (C) 2019, Ossyx
+*/
 #include "Model.hxx"
 
 Model::Model()
@@ -7,7 +10,7 @@ Model::Model()
 Model::~Model()
 {
   //Destroy the m_meshes
-  for(unsigned int i=0; i < m_meshes.size(); ++i)
+  for (unsigned int i=0; i < m_meshes.size(); ++i)
   {
     delete m_meshes[i];
   }
@@ -15,7 +18,7 @@ Model::~Model()
 
 void Model::SetName(std::string const& p_name)
 {
-  m_name = p_name;  
+  m_name = p_name;
 }
 
 void Model::AddMesh(Mesh* p_mesh)
@@ -54,14 +57,14 @@ Material* Model::GetMaterialForMesh(unsigned int p_meshId)
 {
   assert(p_meshId < m_meshes.size());
   UintStringMap::iterator it = m_meshToMaterialLink.find(p_meshId);
-  if(it != m_meshToMaterialLink.end())
+  if (it != m_meshToMaterialLink.end())
   {
     MaterialMap::iterator itMat = m_materials.find(it->second);
-    if(itMat != m_materials.end())
-    {      
+    if (itMat != m_materials.end())
+    {
       return m_materials[it->second];
     }
-  }  
+  }
   MeshLibLog("No material for mesh "<< p_meshId);
   assert(false);
   return NULL;

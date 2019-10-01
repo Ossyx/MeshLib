@@ -31,3 +31,11 @@ target_link_libraries(TestLoading MeshLib)
 add_executable(TestNormalMap ${CMAKE_SOURCE_DIR}/tests/computeNormalMap.cxx)
 target_link_libraries(TestNormalMap MeshLib)
 
+file(GLOB_RECURSE srcs
+  ${CMAKE_SOURCE_DIR}/src/*.cxx
+  ${CMAKE_SOURCE_DIR}/include/*.hxx)
+add_custom_target(VeraStyle ALL
+  vera++
+  --warning
+  ${srcs})
+

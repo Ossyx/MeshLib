@@ -1,3 +1,6 @@
+/**
+* Copyright (C) 2019, Ossyx
+*/
 #ifndef MATERIAL_HXX
 #define MATERIAL_HXX
 
@@ -13,25 +16,25 @@
 
 template <typename T>
 struct Texture
-{  
+{
   Texture();
-  
-  ~Texture(); 
-  
+
+  ~Texture();
+
   Texture(Texture<T> const& p_other);
-  
+
   Texture<T>& operator=(Texture<T> const& p_other);
-  
+
   //B&W Textures
   void Initialize(std::string const& p_filepath,
     unsigned int p_width, unsigned int p_height,
     T* p_data);
-  
+
   //RGB Textures
   void Initialize(std::string const& p_filepath,
     unsigned int p_width, unsigned int p_height,
     T* p_dataR, T* p_dataG, T* p_dataB);
-  
+
   std::string m_filepath;
   unsigned int m_height;
   unsigned int m_width;
@@ -53,9 +56,9 @@ Texture<T>::Texture():
 template <typename T>
 Texture<T>::~Texture()
 {
-  if(m_data != NULL)
+  if (m_data != NULL)
   {
-    delete[] m_data;
+    delete [] m_data;
   }
 }
 
@@ -67,14 +70,14 @@ Texture<T>& Texture<T>::operator=(Texture<T> const& p_other)
   this->m_width = p_other.m_width;
   this->m_height = p_other.m_height;
   this->m_channelCount = p_other.m_channelCount;
-  
-  if(m_data != NULL)
+
+  if (m_data != NULL)
   {
-    delete[] m_data;
+    delete [] m_data;
   }
   unsigned int size = p_other.m_width*p_other.m_height*p_other.m_channelCount;
   m_data = new T[size];
-  std::memcpy(this->m_data, p_other.m_data, size*sizeof(T));  
+  std::memcpy(this->m_data, p_other.m_data, size*sizeof(T));
   return *this;
 }
 
@@ -87,17 +90,17 @@ void Texture<T>::Initialize(std::string const& p_filepath,
   this->m_width = p_width;
   this->m_height = p_height;
   this->m_channelCount = 1;
-  if(m_data != NULL)
+  if (m_data != NULL)
   {
-    delete[] m_data;
-  }  
+    delete [] m_data;
+  }
   unsigned int size = m_width*m_height*m_channelCount;
   m_data = new T[size];
-  
-  for(int i = 0; i < m_width*m_height; ++i)
+
+  for (int i = 0; i < m_width*m_height; ++i)
   {
     m_data[i] = p_data[i];
-  }  
+  }
 }
 
 template <typename T>
@@ -109,15 +112,15 @@ void Texture<T>::Initialize(std::string const& p_filepath,
   this->m_width = p_width;
   this->m_height = p_height;
   this->m_channelCount = 3;
-  if(m_data != NULL)
+  if (m_data != NULL)
   {
-    delete[] m_data;
-  }  
+    delete [] m_data;
+  }
   unsigned int size = m_width*m_height*m_channelCount;
   m_data = new T[size];
-  
+
   //Interleave RGB data
-  for(int i = 0; i < m_width*m_height; ++i)
+  for (int i = 0; i < m_width*m_height; ++i)
   {
     m_data[i*m_channelCount] = p_dataR[i];
     m_data[i*m_channelCount + 1] = p_dataG[i];
@@ -142,22 +145,22 @@ enum DataType
 class Material
 {
 public:
-  
+
   Material();
-  
+
   ~Material();
-  
+
   typedef Texture<unsigned char> ByteTexture;
   typedef Texture<float> FloatTexture;
-   
-  void SetName(std::string const& p_name);  
+
+  void SetName(std::string const& p_name);
   void SetData(std::string const& p_name, float p_data);
   void SetData(std::string const& p_name, glm::vec3 const& p_data);
   void SetData(std::string const& p_name, ByteTexture const& p_data);
   void SetData(std::string const& p_name, FloatTexture const& p_data);
   void SetUniformData(std::string const& p_uniform, std::string const& p_attributeKey);
   void SetShaderName(std::string const& p_name);
-  
+
   std::string GetName() const;
   bool GetData(std::string const& p_name, float& p_data) const;
   bool GetData(std::string const& p_name, glm::vec3& p_data) const;
@@ -166,31 +169,31 @@ public:
   FloatTexture const& GetFloatTexture(std::string const& p_name) const;
   bool GetUniformData(std::string const& p_uniform, std::string& p_attributeKey) const;
   std::string GetShaderName() const;
-  
+
   bool HasFloatData(std::string const& p_name) const;
   bool HasVec3Data(std::string const& p_name) const;
   bool HasUCharTexData(std::string const& p_name) const;
   bool HasFloatTexData(std::string const& p_name) const;
-  
+
 private:
-  
+
   std::string m_name;
-  
+
   typedef std::map<std::string, ByteTexture>  ByteTextureMap;
   ByteTextureMap m_ucharTextures;
-  
+
   typedef std::unordered_map<std::string, FloatTexture>  FloatTextureMap;
   FloatTextureMap m_floatTextures;
-  
+
   typedef std::unordered_map<std::string, float>  FloatMap;
   FloatMap m_floats;
-  
+
   typedef std::unordered_map<std::string, glm::vec3>  Vec3Map;
   Vec3Map m_vec3s;
-  
+
   typedef std::unordered_map<std::string, std::string> StringMap;
   StringMap m_uniforms;
-  
+
   std::string m_shaderName;
 };
 

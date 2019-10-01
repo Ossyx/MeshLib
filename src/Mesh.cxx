@@ -1,3 +1,6 @@
+/**
+* Copyright (C) 2019, Ossyx
+*/
 #include "Mesh.hxx"
 
 #include <assimp/cimport.h>
@@ -25,29 +28,29 @@ Mesh::Mesh(float* p_vPtr, float* p_nPtr, unsigned int* p_tIdPtr, float* p_uvCoor
 
 Mesh::~Mesh()
 {
-  if(m_vertices != NULL)
+  if (m_vertices != NULL)
   {
-    delete[] m_vertices;
+    delete [] m_vertices;
   }
-  if(m_triangles != NULL)
+  if (m_triangles != NULL)
   {
-    delete[] m_triangles;
+    delete [] m_triangles;
   }
-  if(m_normals != NULL)
+  if (m_normals != NULL)
   {
-    delete[] m_normals;
+    delete [] m_normals;
   }
-  if(m_uvCoords != NULL)
+  if (m_uvCoords != NULL)
   {
-    delete[] m_uvCoords;
+    delete [] m_uvCoords;
   }
-  if(m_tangents != NULL)
+  if (m_tangents != NULL)
   {
-    delete[] m_tangents;
+    delete [] m_tangents;
   }
-  if(m_bitangents != NULL)
+  if (m_bitangents != NULL)
   {
-    delete[] m_bitangents;
+    delete [] m_bitangents;
   }
 }
 
@@ -73,7 +76,7 @@ float const* Mesh::GetBitangents() const
 
 float const* Mesh::GetUVCoords() const
 {
-  return m_uvCoords;  
+  return m_uvCoords;
 }
 
 unsigned int const* Mesh::GetTrianglesIndex() const
@@ -85,7 +88,7 @@ unsigned int Mesh::GetVertexCount() const
 {
   return m_vertexCount;
 }
-  
+
 unsigned int Mesh::GetTriangleCount() const
 {
   return m_trianglesCount;
@@ -113,22 +116,20 @@ unsigned int Mesh::GetUVCoordsCount() const
 
 bool Mesh::HasNormals() const
 {
-  return m_normals != NULL;  
+  return m_normals != NULL;
 }
 
 bool Mesh::HasTangents() const
 {
-  return m_tangents != NULL;  
+  return m_tangents != NULL;
 }
 
 bool Mesh::HasBitangents() const
 {
-  return m_bitangents != NULL;  
+  return m_bitangents != NULL;
 }
 
 bool Mesh::HasUVCoords() const
 {
-  return m_uvCoords != NULL;  
+  return m_uvCoords != NULL;
 }
-
-

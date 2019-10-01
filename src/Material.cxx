@@ -1,3 +1,6 @@
+/**
+* Copyright (C) 2019, Ossyx
+*/
 #include "Material.hxx"
 
 Material::Material():
@@ -41,7 +44,7 @@ void Material::SetData(std::string const& p_name, Material::FloatTexture const& 
 
 void Material::SetUniformData(std::string const& p_uniform, std::string const& p_attributeKey)
 {
-  m_uniforms[p_uniform] = p_attributeKey; 
+  m_uniforms[p_uniform] = p_attributeKey;
 }
 
 
@@ -53,7 +56,7 @@ void Material::SetShaderName(std::string const& p_name)
 bool Material::GetData(std::string const& p_name, float& p_data) const
 {
   FloatMap::const_iterator it = m_floats.find(p_name);
-  if(it != m_floats.cend())
+  if (it != m_floats.cend())
   {
     p_data = it->second;
     return true;
@@ -64,7 +67,7 @@ bool Material::GetData(std::string const& p_name, float& p_data) const
 bool Material::GetData(std::string const& p_name, glm::vec3& p_data) const
 {
   Vec3Map::const_iterator it = m_vec3s.find(p_name);
-  if(it != m_vec3s.cend())
+  if (it != m_vec3s.cend())
   {
     p_data = it->second;
     return true;
@@ -107,7 +110,7 @@ bool Material::HasFloatTexData(std::string const& p_name) const
 bool Material::GetUniformData(std::string const& p_uniform, std::string& p_attributeKey) const
 {
   StringMap::const_iterator it = m_uniforms.find(p_uniform);
-  if(it != m_uniforms.cend())
+  if (it != m_uniforms.cend())
   {
     p_attributeKey = it->second;
     return true;
