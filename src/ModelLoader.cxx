@@ -46,7 +46,7 @@ void ModelLoader::LoadOBJModel(
   filepath += p_file;
   const aiScene* scene = aiImportFile(filepath.c_str(), flag);
 
-  if (scene == false)
+  if (scene == NULL)
   {
     MeshLibLog("Error : "<< aiGetErrorString());
     return;
