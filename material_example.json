@@ -1,0 +1,44 @@
+{
+  "Material1": {
+    "Shader": {
+      "name": "MyShader",
+      "vertex": "vertex.shader",
+      "fragment": "fragment.shader"
+    },
+    "Attributes": [
+      {
+        "name": "AmbientColor",
+        "type": "vec3",
+        "value": [
+          0,
+          0,
+          0
+        ],
+        "Uniform": "ambient_color"
+      },
+      {
+        "name": "Texture1",
+        "type": "UCharTex",
+        "value": "my/tex/ture.jpg",
+        "Uniform": "texture_1"
+      },
+      {
+        "name": "Texture2",
+        "type": "FloatTexture",
+        "value": "my/tex/ture.tif",
+        "Uniform": "texture_2"
+      },
+      {
+        "name": "DiffuseColor",
+        "type": "vec4",
+        "value": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "Uniform": "diffuse_color"
+      }
+    ]
+  }
+}
