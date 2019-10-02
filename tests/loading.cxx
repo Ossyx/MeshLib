@@ -1,17 +1,24 @@
 #include <string>
+#include <chrono>
 
 #include "ModelLoader.hxx"
- 
+
 int main(int argc, char** argv)
-{  
+{
   if(argc >= 2)
   {
     std::string directory(argv[1]);
     std::string file(argv[2]);
-    MeshLibLog("Try loading from directory "<<directory
-      <<" file "<<file<<" as test model.");
-    
+    MeshLibLog("Loading file "<< file <<" from directory "<< directory <<".");
+
+    auto tbegin = std::chrono::steady_clock::now();
+
     ModelLoader loader;
     loader.LoadOBJModel(directory, file, "testModel");
+
+    auto tend = std::chrono::steady_clock::now();
+    float millis = std::chrono::duration_cast<std::chrono::milliseconds>(tend - tbegin).count();
+
+    MeshLibLog("Total loading time is "<< millis / 1000.0f << "s");
   }
 }

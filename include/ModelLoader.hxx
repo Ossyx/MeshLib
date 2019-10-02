@@ -7,6 +7,8 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <thread>
+#include <mutex>
 
 #include <assimp/cimport.h>
 #include <assimp/scene.h>

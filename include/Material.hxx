@@ -154,25 +154,49 @@ public:
   typedef Texture<float> FloatTexture;
 
   void SetName(std::string const& p_name);
+
   void SetData(std::string const& p_name, float p_data);
+
   void SetData(std::string const& p_name, glm::vec3 const& p_data);
+
+  //Create a deep copy of the texture from p_data
   void SetData(std::string const& p_name, ByteTexture const& p_data);
+
+  //Create a deep copy of the texture
   void SetData(std::string const& p_name, FloatTexture const& p_data);
+
+  //Create a ByteTexture and return a reference to it
+  ByteTexture& AddByteTexData(std::string const& p_name);
+
+  //Create a FloatTexture and return a reference to it
+  FloatTexture& AddFloatTexData(std::string const& p_name);
+
   void SetUniformData(std::string const& p_uniform, std::string const& p_attributeKey);
+
   void SetShaderName(std::string const& p_name);
 
   std::string GetName() const;
+
   bool GetData(std::string const& p_name, float& p_data) const;
+
   bool GetData(std::string const& p_name, glm::vec3& p_data) const;
+
   bool GetData(std::string const& p_name, glm::vec4& p_data) const;
+
   ByteTexture const& GetByteTexture(std::string const& p_name) const;
+
   FloatTexture const& GetFloatTexture(std::string const& p_name) const;
+
   bool GetUniformData(std::string const& p_uniform, std::string& p_attributeKey) const;
+
   std::string GetShaderName() const;
 
   bool HasFloatData(std::string const& p_name) const;
+
   bool HasVec3Data(std::string const& p_name) const;
+
   bool HasUCharTexData(std::string const& p_name) const;
+
   bool HasFloatTexData(std::string const& p_name) const;
 
 private:

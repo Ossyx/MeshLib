@@ -217,21 +217,35 @@ void ModelLoader::LoadFromJsonMaterial(Model& p_model, std::string const& p_dire
     return;
   }
 
+  //Each thread needs material key, root data and p_model and a mutex for p_model
+  std::mutex model_mutex;
+  std::vector<std::thread> matThreads;
   std::vector<std::string> const& materialKeys = root.getMemberNames();
   for (int i = 0; i < materialKeys.size(); ++i)
   {
-    MeshLibLog("Reading material " << materialKeys[i]);
-    Material* mat = new Material();
-    mat->SetName(materialKeys[i]);
-    Json::Value matAttributes = root[materialKeys[i]]["Attributes"];
-    Json::Value matShader = root[materialKeys[i]]["Shader"];
+    std::string materialKey = materialKeys[i];
+    matThreads.push_back(std::thread( [this, &model_mutex, materialKey, &root, &p_model]
+      {
+        Material* mat = new Material();
+        mat->SetName(materialKey);
+        Json::Value matAttributes = root[materialKey]["Attributes"];
+        Json::Value matShader = root[materialKey]["Shader"];
 
-    mat->SetShaderName(matShader["name"].asString());
-    for (int attIdx = 0; attIdx < matAttributes.size(); ++attIdx)
-    {
-      LoadJsonAttribute(*mat, matAttributes[attIdx]);
-    }
-    p_model.AddMaterial(mat, materialKeys[i]);
+        mat->SetShaderName(matShader["name"].asString());
+        for (int attIdx = 0; attIdx < matAttributes.size(); ++attIdx)
+        {
+          LoadJsonAttribute(*mat, matAttributes[attIdx]);
+        }
+        model_mutex.lock();
+        p_model.AddMaterial(mat, materialKey);
+        model_mutex.unlock();
+      }
+    ));
+  }
+
+  for (int i = 0; i < matThreads.size(); ++i)
+  {
+    matThreads[i].join();
   }
 }
 
@@ -255,7 +269,7 @@ void ModelLoader::LoadJsonAttribute(Material& p_material, Json::Value const& p_v
     }
     else
     {
-      MeshLibLog("Unsupported attribute type : "<<attType);
+      MeshLibLog("Unsupported attribute type : "<< attType);
       assert(false);
     }
   }
@@ -291,17 +305,17 @@ void ModelLoader::AttributeAsByteTexture(Material& p_material, Json::Value const
   std::string value = p_value["value"].asString();;
   MeshLibLog("Loading "<< name <<" texture "<< value);
 
-  Texture<unsigned char> tex;
+  Texture<unsigned char>& tex = p_material.AddByteTexData(name);
   LoadTextureFromFile(m_directory, value, tex);
-  p_material.SetData(name, tex);
+  //p_material.SetData(name, tex);
 
   //Special case of bump map, generating normalmap
   if (name == "map_bump")
   {
     MeshLibLog("Generating a normal map from texture "<< value);
-    Texture<unsigned char> texNormalMap;
+    Texture<unsigned char>& texNormalMap = p_material.AddByteTexData("normalMap");
     LoadAndComputeNormalMap(m_directory, value, texNormalMap);
-    p_material.SetData("normalMap", texNormalMap);
+    //p_material.SetData("normalMap", texNormalMap);
     p_material.SetUniformData("normalMap", "normalMap");
   }
 }
@@ -349,9 +363,9 @@ void ModelLoader::LoadTextures(aiMaterial* p_aiMaterial, Material& p_mat)
     {
       //TODO Do not assume textures will only be rgb
       MeshLibLog("Loading "<< p_parameterName <<" texture "<<texturePath.C_Str());
-      Texture<unsigned char> tex;
+      Texture<unsigned char>& tex = p_oMat.AddByteTexData(p_parameterName);
       LoadTextureFromFile(m_directory, texturePath.C_Str(), tex);
-      p_oMat.SetData(p_parameterName, tex);
+      //p_oMat.SetData(p_parameterName, tex);
     }
   };
 

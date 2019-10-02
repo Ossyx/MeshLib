@@ -122,3 +122,17 @@ std::string Material::GetShaderName() const
 {
   return m_shaderName;
 }
+
+Material::ByteTexture& Material::AddByteTexData(std::string const& p_name)
+{
+  ByteTextureMap::const_iterator it = m_ucharTextures.find(p_name);
+  assert(it == m_ucharTextures.cend());
+  return m_ucharTextures[p_name];
+}
+
+Material::FloatTexture& Material::AddFloatTexData(std::string const& p_name)
+{
+  FloatTextureMap::const_iterator it = m_floatTextures.find(p_name);
+  assert(it == m_floatTextures.cend());
+  return m_floatTextures[p_name];
+}
