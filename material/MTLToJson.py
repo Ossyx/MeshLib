@@ -1,13 +1,15 @@
+import os
 import argparse
 import json
+import image_processing
 
 parser = argparse.ArgumentParser()
 parser.add_argument("inputMtl")
 parser.add_argument("outputJson")
 args = parser.parse_args()
 
-filepath = args.inputMtl
-outputFilePath = args.outputJson
+mtl_filepath = args.inputMtl
+output_file_path = args.outputJson
 
 class Material:
   def __init__(self, name, attributeUniformMap):
@@ -41,6 +43,19 @@ class Material:
         materialObject["Shader"]["name"] = "Textured"
     else:
       materialObject["Shader"]["name"] = "Colored"
+
+    if "map_bump" in self.textureAttributes :
+      #Generate the matching normal map name
+      bumpfilename, file_extension = os.path.splitext(self.textureAttributes["map_bump"])
+      normalFileName = bumpfilename + "_generated_normals" + file_extension
+      self.textureAttributes["map_normal"] = normalFileName
+
+      #Get bump and normal map real path
+      directory = os.path.dirname(os.path.abspath(mtl_filepath))
+      properBumpFilePath = directory + "/" + bumpfilename.replace("\\", "/") + file_extension
+      properNormalFilePath = directory + "/" + normalFileName.replace("\\", "/")
+      image_processing.GenerateNormalMap(properBumpFilePath,  properNormalFilePath)
+
 
     materialObject["Attributes"] = list()
 
@@ -91,13 +106,14 @@ UniformMap["map_Ka"] = "texture2"
 UniformMap["map_Ks"] = "texture3"
 UniformMap["map_bump"] = "texture4"
 UniformMap["map_d"] = "texture5"
+UniformMap["map_normal"] = "texture6"
 
 FloatToParse = ["Ns", "Ni", "d", "Tr", "illum"]
 Vec3ToParse = ["Tf", "Ka", "Kd", "Ks", "Ke"]
 TextureToPars = ["map_Ka", "map_Kd", "map_d", "map_bump"]
 
 
-with open(filepath) as fp:
+with open(mtl_filepath) as fp:
    line = fp.readline()
    cnt = 1
    while line:
@@ -133,5 +149,5 @@ jsonRep = dict()
 for mat in materialList:
   jsonRep[mat.name] = mat.ToDict()
 
-with open(outputFilePath, "w") as write_file:
+with open(output_file_path, "w") as write_file:
     json.dump(jsonRep, write_file, indent=4)
