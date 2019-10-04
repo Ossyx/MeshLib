@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 project(MeshLib)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
+set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install")
 
 #Assimp is a dependency
 find_package(Assimp REQUIRED)
@@ -25,8 +26,12 @@ add_library(MeshLib SHARED
 target_include_directories(MeshLib PUBLIC ${ASSIMP_INCLUDE_DIRS})
 target_link_libraries(MeshLib ${ASSIMP_LIBRARIES} ${CImg_LIBRARIES} ${JsonCpp_LIBRARY})
 
+install(TARGETS MeshLib DESTINATION lib)
+
 add_executable(TestLoading ${CMAKE_SOURCE_DIR}/tests/loading.cxx)
 target_link_libraries(TestLoading MeshLib)
+
+install(TARGETS TestLoading DESTINATION bin)
 
 add_subdirectory(modules)
 

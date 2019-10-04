@@ -18,5 +18,8 @@ target_link_libraries(image_processing ${CImg_LIBRARIES} ${PYTHON_LIBRARIES})
 set_target_properties(image_processing PROPERTIES OUTPUT_NAME _image_processing)
 SET_TARGET_PROPERTIES(image_processing PROPERTIES PREFIX "")
 
+install(TARGETS image_processing DESTINATION modules)
+install(FILES ${MODULE_BINARY_DIR}/image_processing.py DESTINATION modules)
+
 #add_dependencies(image_processing swig_module_image_processing)
 
