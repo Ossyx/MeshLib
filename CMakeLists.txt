@@ -19,7 +19,7 @@ add_library(MeshLib SHARED
   ${CMAKE_SOURCE_DIR}/src/Material.cxx
   ${CMAKE_SOURCE_DIR}/src/Model.cxx
   ${CMAKE_SOURCE_DIR}/src/ModelLoader.cxx)
-  
+
 #target_include_directories(MeshLib PUBLIC ${ASSIMP_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/glm)
 
 target_include_directories(MeshLib PUBLIC ${ASSIMP_INCLUDE_DIRS})
@@ -28,8 +28,7 @@ target_link_libraries(MeshLib ${ASSIMP_LIBRARIES} ${CImg_LIBRARIES} ${JsonCpp_LI
 add_executable(TestLoading ${CMAKE_SOURCE_DIR}/tests/loading.cxx)
 target_link_libraries(TestLoading MeshLib)
 
-add_executable(TestNormalMap ${CMAKE_SOURCE_DIR}/tests/computeNormalMap.cxx)
-target_link_libraries(TestNormalMap MeshLib)
+add_subdirectory(modules)
 
 file(GLOB_RECURSE srcs
   ${CMAKE_SOURCE_DIR}/src/*.cxx

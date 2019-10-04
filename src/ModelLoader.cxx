@@ -308,16 +308,6 @@ void ModelLoader::AttributeAsByteTexture(Material& p_material, Json::Value const
   Texture<unsigned char>& tex = p_material.AddByteTexData(name);
   LoadTextureFromFile(m_directory, value, tex);
   //p_material.SetData(name, tex);
-
-  //Special case of bump map, generating normalmap
-  if (name == "map_bump")
-  {
-    MeshLibLog("Generating a normal map from texture "<< value);
-    Texture<unsigned char>& texNormalMap = p_material.AddByteTexData("normalMap");
-    LoadAndComputeNormalMap(m_directory, value, texNormalMap);
-    //p_material.SetData("normalMap", texNormalMap);
-    p_material.SetUniformData("normalMap", "normalMap");
-  }
 }
 
 void ModelLoader::LoadFromAiMaterial(Model& p_model, aiMaterial* p_aiMaterial)
@@ -405,20 +395,6 @@ void ModelLoader::LoadTextureFromFile(std::string const& p_directory, std::strin
   }
 }
 
-void ModelLoader::LoadAndComputeNormalMap(std::string const& p_directory,
-  std::string const& p_fileName, Texture<unsigned char>& p_texture)
-{
-  std::string path = m_directory + "/" + p_fileName;
-  std::replace( path.begin(), path.end(), '\\', '/');
-  cimg::CImg<unsigned char> image(path.c_str());
-  image.mirror('y');
-  assert(image.spectrum() == 1);
-  if (image.spectrum() == 1)
-  {
-    ComputeNormalMap(image, p_texture);
-  }
-}
-
 Model* ModelLoader::FindModel(std::string const& p_name)
 {
   ModelMap::iterator it = m_modelMap.find(p_name);
@@ -430,59 +406,4 @@ Model* ModelLoader::FindModel(std::string const& p_name)
   {
     return NULL;
   }
-}
-
-void ModelLoader::ComputeNormalMap(cimg::CImg<unsigned char>const& p_bumpMap,
-  Texture<unsigned char>& p_normalMap)
-{
-  cimg::CImgList<float> gradients = p_bumpMap.get_gradient("xy", 1);
-  cimg::CImg<float>& xgradient = gradients.front();
-  cimg::CImg<float>& ygradient = gradients.back();
-
-  //Output is an rgb image
-  cimg::CImg<unsigned char> normalMap(xgradient.width(), xgradient.height(), 1, 3, 0);
-
-  //[-1.0, 1.0] --> [0, 255]
-  auto MapFloatToChar = [](float p_float)
-  {
-    return static_cast<unsigned char>((p_float + 1.0f) * 255 / 2.0f);
-  };
-
-  for (int i=0; i < normalMap.width(); ++i)
-  {
-    for (unsigned j=0; j < normalMap.height(); ++j)
-    {
-      float& xgrad = xgradient(i, j);
-      float& ygrad = ygradient(i, j);
-
-      unsigned char& x = normalMap(i, j, 0);
-      unsigned char& y = normalMap(i, j, 1);
-      unsigned char& z = normalMap(i, j, 2);
-
-      glm::vec3 normal(0.0f, 0.0f, 1.0f);
-
-      auto rotYMat = glm::rotate(xgrad / 255.0f * 15.0f, glm::vec3(0.0, 1.0, 0.0));
-      auto rotXMat = glm::rotate(ygrad / 255.0f * 15.0f, glm::vec3(1.0, 0.0, 0.0));
-
-      auto rotMap = rotYMat * rotXMat;
-      normal = glm::vec3(rotMap * glm::vec4(normal, 1.0f));
-
-      x = MapFloatToChar(normal.x);
-      y = MapFloatToChar(normal.y);
-      z = MapFloatToChar(normal.z);
-    }
-  }
-
-//   cimg::CImgDisplay main_disp(normalMap,"Click a point");
-//   while (!main_disp.is_closed())
-//   {
-//     main_disp.wait();
-//   }
-
-  unsigned int pixelCount = normalMap.width() * normalMap.height();
-  p_normalMap.Initialize("GeneratedNormalMap",
-    static_cast<unsigned int>(normalMap.width()),
-    static_cast<unsigned int>(normalMap.height()),
-    normalMap.data(), normalMap.data(pixelCount),
-    normalMap.data(2*pixelCount));
 }
