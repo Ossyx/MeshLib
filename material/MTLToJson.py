@@ -110,7 +110,7 @@ UniformMap["map_normal"] = "texture6"
 
 FloatToParse = ["Ns", "Ni", "d", "Tr", "illum"]
 Vec3ToParse = ["Tf", "Ka", "Kd", "Ks", "Ke"]
-TextureToPars = ["map_Ka", "map_Kd", "map_d", "map_bump"]
+TextureToPars = ["map_Ka", "map_Kd", "map_d", "map_bump", "map_Ks"]
 
 
 with open(mtl_filepath) as fp:
