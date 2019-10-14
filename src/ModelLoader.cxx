@@ -25,7 +25,7 @@ ModelLoader::~ModelLoader()
   ModelMap::iterator it = m_modelMap.begin();
   for (; it != m_modelMap.end(); ++it)
   {
-    MeshLibLog("Unloading model "<<it->first<<"...");
+    rxLogInfo("Unloading model "<<it->first<<"...");
     delete it->second;
   }
 }
@@ -48,11 +48,11 @@ void ModelLoader::LoadOBJModel(
 
   if (scene == NULL)
   {
-    MeshLibLog("Error : "<< aiGetErrorString());
+    rxLogError("Error : "<< aiGetErrorString());
     return;
   }
 
-  MeshLibLog("Loading model "<<p_name<<" from file "<< filepath);
+  rxLogInfo("Loading model "<<p_name<<" from file "<< filepath);
   Model* loadedModel = new Model();
   loadedModel->SetName(p_name);
 
@@ -84,7 +84,7 @@ void ModelLoader::LoadOBJModel(
 
 void ModelLoader::LoadFromAiMesh(Model& p_model, aiMesh* p_aiMesh)
 {
-  MeshLibLog("-- Loading mesh for model "<<p_model.GetName()<<" with "
+  rxLogInfo("-- Loading mesh for model "<<p_model.GetName()<<" with "
     <<p_aiMesh->mNumVertices<<" vertices "
     <<"and "<<p_aiMesh->mNumFaces<<" faces.");
 
@@ -98,17 +98,17 @@ void ModelLoader::LoadFromAiMesh(Model& p_model, aiMesh* p_aiMesh)
 
   if (p_aiMesh->HasNormals() == true)
   {
-    MeshLibLog("  Mesh has normals.");
+    rxLogInfo("  Mesh has normals.");
     normalPtr = new float[p_aiMesh->mNumVertices*3];
   }
   if (p_aiMesh->HasTextureCoords(0) == true)
   {
-    MeshLibLog("  Mesh has texture coordinates.");
+    rxLogInfo("  Mesh has texture coordinates.");
     uvCoordsPtr = new float[p_aiMesh->mNumVertices*2];
 
     if (p_aiMesh->HasTangentsAndBitangents())
     {
-      MeshLibLog("  Mesh has tangents and bitangents.");
+      rxLogInfo("  Mesh has tangents and bitangents.");
       tangentPtr = new float[p_aiMesh->mNumVertices*3];
       bitangentPtr = new float[p_aiMesh->mNumVertices*3];
     }
@@ -161,12 +161,12 @@ void ModelLoader::LoadFromAiMesh(Model& p_model, aiMesh* p_aiMesh)
   {
     if (p_aiMesh->mFaces->mNumIndices < 3)
     {
-      MeshLibLog("Error : Faces with  less than 3 indices not supported.");
+      rxLogError("Error : Faces with  less than 3 indices not supported.");
       return;
     }
     if (p_aiMesh->mFaces->mNumIndices > 3)
     {
-      MeshLibLog("Error : Faces with more than 3 indices not supported.");
+      rxLogError("Error : Faces with more than 3 indices not supported.");
       return;
     }
     aiFace const& assimpFace = p_aiMesh->mFaces[numTri];
@@ -199,11 +199,11 @@ void ModelLoader::LoadFromJsonMaterial(Model& p_model, std::string const& p_dire
   input.open(jsonMatFile.c_str());
   if (input.is_open())
   {
-    MeshLibLog("Reading material file "<<jsonMatFile);
+    rxLogInfo("Reading material file "<<jsonMatFile);
   }
   else
   {
-    MeshLibLog("Cannot find json material file "<<jsonMatFile);
+    rxLogError("Cannot find json material file "<<jsonMatFile);
     return;
   }
 
@@ -213,7 +213,7 @@ void ModelLoader::LoadFromJsonMaterial(Model& p_model, std::string const& p_dire
   if (parsingSuccessful == false)
   {
       // report to the user the failure and their locations in the document.
-    MeshLibLog("Fail to parse material file : "<<reader.getFormattedErrorMessages());
+    rxLogError("Fail to parse material file : "<<reader.getFormattedErrorMessages());
     return;
   }
 
@@ -269,7 +269,7 @@ void ModelLoader::LoadJsonAttribute(Material& p_material, Json::Value const& p_v
     }
     else
     {
-      MeshLibLog("Unsupported attribute type : "<< attType);
+      rxLogError("Unsupported attribute type : "<< attType);
       assert(false);
     }
   }
@@ -285,7 +285,7 @@ void ModelLoader::AttributeAsFloat(Material& p_material, Json::Value const& p_va
   std::string name = p_value["name"].asString();
   float value = p_value["value"].asFloat();
   p_material.SetData(name, value);
-  MeshLibLog("Loading "<<name <<" ("<<value<<")");
+  rxLogInfo("Loading "<<name <<" ("<<value<<")");
 }
 
 void ModelLoader::AttributeAsVec3(Material& p_material, Json::Value const& p_value)
@@ -296,14 +296,14 @@ void ModelLoader::AttributeAsVec3(Material& p_material, Json::Value const& p_val
     p_value["value"][2].asFloat());
 
   p_material.SetData(name, value);
-  MeshLibLog("Loading "<<name <<" ("<<value.r<<","<<value.g<<","<<value.b<<")");
+  rxLogInfo("Loading "<<name <<" ("<<value.r<<","<<value.g<<","<<value.b<<")");
 }
 
 void ModelLoader::AttributeAsByteTexture(Material& p_material, Json::Value const& p_value)
 {
   std::string name = p_value["name"].asString();
   std::string value = p_value["value"].asString();;
-  MeshLibLog("Loading "<< name <<" texture "<< value);
+  rxLogInfo("Loading "<< name <<" texture "<< value);
 
   Texture<unsigned char>& tex = p_material.AddByteTexData(name);
   LoadTextureFromFile(m_directory, value, tex);
@@ -314,7 +314,7 @@ void ModelLoader::LoadFromAiMaterial(Model& p_model, aiMaterial* p_aiMaterial)
 {
   aiString name;
   p_aiMaterial->Get(AI_MATKEY_NAME, name);
-  MeshLibLog("-- Loading material "<<name.C_Str());
+  rxLogInfo("-- Loading material "<<name.C_Str());
   Material* mat = new Material();
   LoadColors(p_aiMaterial, *mat);
   LoadTextures(p_aiMaterial, *mat);
@@ -329,7 +329,7 @@ void ModelLoader::LoadColors(aiMaterial* p_aiMaterial, Material& p_mat)
     aiColor3D color (0.f,0.f,0.f);
     if (p_aiMaterial->Get(p_Key, p_type, p_idx, color) == AI_SUCCESS)
     {
-      MeshLibLog("Loading "<<p_parameterName <<"("<<color.r<<","<<color.g<<","<<color.b<<")");
+      rxLogInfo("Loading "<<p_parameterName <<"("<<color.r<<","<<color.g<<","<<color.b<<")");
       p_oMat.SetData(p_parameterName, glm::vec3(color.b, color.g, color.r));
     }
   };
@@ -352,7 +352,7 @@ void ModelLoader::LoadTextures(aiMaterial* p_aiMaterial, Material& p_mat)
     && p_aiMaterial->GetTexture(p_type, 0, &texturePath) == AI_SUCCESS)
     {
       //TODO Do not assume textures will only be rgb
-      MeshLibLog("Loading "<< p_parameterName <<" texture "<<texturePath.C_Str());
+      rxLogInfo("Loading "<< p_parameterName <<" texture "<<texturePath.C_Str());
       Texture<unsigned char>& tex = p_oMat.AddByteTexData(p_parameterName);
       LoadTextureFromFile(m_directory, texturePath.C_Str(), tex);
       //p_oMat.SetData(p_parameterName, tex);

@@ -9,7 +9,7 @@ int main(int argc, char** argv)
   {
     std::string directory(argv[1]);
     std::string file(argv[2]);
-    MeshLibLog("Loading file "<< file <<" from directory "<< directory <<".");
+    rxLogInfo("Loading file "<< file <<" from directory "<< directory <<".");
 
     auto tbegin = std::chrono::steady_clock::now();
 
@@ -19,6 +19,6 @@ int main(int argc, char** argv)
     auto tend = std::chrono::steady_clock::now();
     float millis = std::chrono::duration_cast<std::chrono::milliseconds>(tend - tbegin).count();
 
-    MeshLibLog("Total loading time is "<< millis / 1000.0f << "s");
+    rxLogInfo("Total loading time is "<< millis / 1000.0f << "s");
   }
 }

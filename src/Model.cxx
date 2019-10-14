@@ -65,7 +65,7 @@ Material* Model::GetMaterialForMesh(unsigned int p_meshId)
       return m_materials[it->second];
     }
   }
-  MeshLibLog("No material for mesh "<< p_meshId);
+  rxLogError("No material for mesh "<< p_meshId);
   assert(false);
   return NULL;
 }
