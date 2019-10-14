@@ -13,17 +13,18 @@ find_package(JsonCpp REQUIRED)
 #glm is a dependency
 find_package(glm REQUIRED)
 
-#set(GLM_INCLUDE "/home/bertrand/Work/Lib/glm/install/include")
 include_directories(${CMAKE_SOURCE_DIR}/include ${glm_DIR} ${CImg_INCLUDE_DIR}
 ${JsonCpp_INCLUDE_DIR})
+
+file(GLOB_RECURSE headers
+  ${CMAKE_SOURCE_DIR}/include/*.hxx)
+install(FILES ${headers} DESTINATION include)
 
 add_library(MeshLib SHARED
   ${CMAKE_SOURCE_DIR}/src/Mesh.cxx
   ${CMAKE_SOURCE_DIR}/src/Material.cxx
   ${CMAKE_SOURCE_DIR}/src/Model.cxx
   ${CMAKE_SOURCE_DIR}/src/ModelLoader.cxx)
-
-#target_include_directories(MeshLib PUBLIC ${ASSIMP_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/glm)
 
 target_include_directories(MeshLib PUBLIC ${ASSIMP_INCLUDE_DIRS})
 target_link_libraries(MeshLib ${ASSIMP_LIBRARIES} ${CImg_LIBRARIES} ${JsonCpp_LIBRARY})
