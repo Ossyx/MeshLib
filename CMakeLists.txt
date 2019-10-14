@@ -10,9 +10,11 @@ find_package(Assimp REQUIRED)
 find_package(CImg REQUIRED)
 #JSon is a dependency
 find_package(JsonCpp REQUIRED)
+#glm is a dependency
+find_package(glm REQUIRED)
 
-set(GLM_INCLUDE "/home/bertrand/Work/Lib/glm/install/include")
-include_directories(${CMAKE_SOURCE_DIR}/include ${GLM_INCLUDE} ${CImg_INCLUDE_DIR}
+#set(GLM_INCLUDE "/home/bertrand/Work/Lib/glm/install/include")
+include_directories(${CMAKE_SOURCE_DIR}/include ${glm_DIR} ${CImg_INCLUDE_DIR}
 ${JsonCpp_INCLUDE_DIR})
 
 add_library(MeshLib SHARED
