@@ -24,6 +24,8 @@
 #include "Model.hxx"
 #include "Common.hxx"
 
+namespace rx
+{
 
 class ModelLoader
 {
@@ -77,5 +79,7 @@ private:
   std::string m_directory;
 
 };
+
+}
 
 #endif

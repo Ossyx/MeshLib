@@ -7,6 +7,9 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+namespace rx
+{
+
 Mesh::Mesh(float* p_vPtr, float* p_nPtr, unsigned int* p_tIdPtr, float* p_uvCoords,
   float* p_tangentPtr, float* p_bitangentPtr, unsigned int p_vertexCount,
   unsigned int p_normalCount, unsigned int p_tangentCount, unsigned int p_bitangentCount,
@@ -132,4 +135,6 @@ bool Mesh::HasBitangents() const
 bool Mesh::HasUVCoords() const
 {
   return m_uvCoords != NULL;
+}
+
 }

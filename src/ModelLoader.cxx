@@ -16,6 +16,9 @@
 
 namespace cimg = cimg_library;
 
+namespace rx
+{
+
 ModelLoader::ModelLoader()
 {
 }
@@ -406,4 +409,6 @@ Model* ModelLoader::FindModel(std::string const& p_name)
   {
     return NULL;
   }
+}
+
 }

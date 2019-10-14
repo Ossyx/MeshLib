@@ -11,6 +11,9 @@
 #include "Mesh.hxx"
 #include "Material.hxx"
 
+namespace rx
+{
+
 class Model
 {
 public:
@@ -54,5 +57,7 @@ private:
   typedef std::map<unsigned int, std::string> UintStringMap;
   UintStringMap m_meshToMaterialLink;
 };
+
+}
 
 #endif

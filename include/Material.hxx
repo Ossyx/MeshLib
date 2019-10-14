@@ -14,6 +14,9 @@
 
 #include "Common.hxx"
 
+namespace rx
+{
+
 template <typename T>
 struct Texture
 {
@@ -223,4 +226,5 @@ private:
   std::string m_shaderName;
 };
 
+}
 #endif

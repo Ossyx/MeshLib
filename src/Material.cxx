@@ -2,6 +2,8 @@
 * Copyright (C) 2019, Ossyx
 */
 #include "Material.hxx"
+namespace rx
+{
 
 Material::Material():
 m_name("")
@@ -140,4 +142,6 @@ Material::FloatTexture& Material::AddFloatTexData(std::string const& p_name)
   FloatTextureMap::const_iterator it = m_floatTextures.find(p_name);
   assert(it == m_floatTextures.cend());
   return m_floatTextures[p_name];
+}
+
 }

@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 
     auto tbegin = std::chrono::steady_clock::now();
 
-    ModelLoader loader;
+    rx::ModelLoader loader;
     loader.LoadOBJModel(directory, file, "testModel");
 
     auto tend = std::chrono::steady_clock::now();

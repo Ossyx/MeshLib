@@ -9,6 +9,9 @@
 
 #include "Common.hxx"
 
+namespace rx
+{
+
 class Mesh
 {
 public:
@@ -53,5 +56,7 @@ private:
   unsigned int m_trianglesCount;
   unsigned int m_uvCoordsCount;
 };
+
+}
 
 #endif

@@ -3,6 +3,9 @@
 */
 #include "Model.hxx"
 
+namespace rx
+{
+
 Model::Model()
 {
 }
@@ -73,4 +76,6 @@ Material* Model::GetMaterialForMesh(unsigned int p_meshId)
 std::string Model::GetName()
 {
   return m_name;
+}
+
 }
