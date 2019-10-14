@@ -31,7 +31,7 @@ void GenerateNormalMap(std::string const& p_bumpMapInput, std::string const& p_n
       glm::vec3 normal(0.0f, 0.0f, 1.0f);
 
       auto rotYMat = glm::rotate(xgrad / 255.0f * 10.0f * -1.0f, glm::vec3(0.0, 1.0, 0.0));
-      auto rotXMat = glm::rotate(ygrad / 255.0f * 10.0f * -1.0f, glm::vec3(1.0, 0.0, 0.0));
+      auto rotXMat = glm::rotate(ygrad / 255.0f * 10.0f, glm::vec3(1.0, 0.0, 0.0));
 
       auto rotMap = rotYMat * rotXMat;
       normal = glm::vec3(rotMap * glm::vec4(normal, 1.0f));
