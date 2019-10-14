@@ -118,6 +118,11 @@ bool Material::GetUniformData(std::string const& p_uniform, std::string& p_attri
   return false;
 }
 
+Material::StringMap const& Material::GetUniforms() const
+{
+  return m_uniforms;
+}
+
 std::string Material::GetShaderName() const
 {
   return m_shaderName;

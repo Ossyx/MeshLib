@@ -152,6 +152,7 @@ public:
 
   typedef Texture<unsigned char> ByteTexture;
   typedef Texture<float> FloatTexture;
+  typedef std::unordered_map<std::string, std::string> StringMap;
 
   void SetName(std::string const& p_name);
 
@@ -189,6 +190,8 @@ public:
 
   bool GetUniformData(std::string const& p_uniform, std::string& p_attributeKey) const;
 
+  StringMap const& GetUniforms() const;
+
   std::string GetShaderName() const;
 
   bool HasFloatData(std::string const& p_name) const;
@@ -215,7 +218,6 @@ private:
   typedef std::unordered_map<std::string, glm::vec3>  Vec3Map;
   Vec3Map m_vec3s;
 
-  typedef std::unordered_map<std::string, std::string> StringMap;
   StringMap m_uniforms;
 
   std::string m_shaderName;
