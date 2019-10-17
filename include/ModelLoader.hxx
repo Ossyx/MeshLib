@@ -61,8 +61,11 @@ private:
 
   void AttributeAsByteTexture(Material& p_material, Json::Value const& p_value);
 
+  void AttributeAsUShortTexture(Material& p_material, Json::Value const& p_value);
+
+  template <typename T>
   void LoadTextureFromFile(std::string const& p_directory, std::string const& p_fileName,
-    Texture<unsigned char>& p_texture);
+    Texture<T>& p_texture);
 
   bool FindAndGetJsonMaterialFile(std::string const& p_objFilePath,
     std::ifstream& p_inputStream);

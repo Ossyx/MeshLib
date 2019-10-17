@@ -186,6 +186,7 @@ public:
 
   typedef Texture<unsigned char> ByteTexture;
   typedef Texture<float> FloatTexture;
+  typedef Texture<unsigned short> UShortTexture;
   typedef std::unordered_map<std::string, std::string> StringMap;
 
   void SetName(std::string const& p_name);
@@ -200,11 +201,17 @@ public:
   //Create a deep copy of the texture
   void SetData(std::string const& p_name, FloatTexture const& p_data);
 
+  //Create a deep copy of the texture
+  void SetData(std::string const& p_name, UShortTexture const& p_data);
+
   //Create a ByteTexture and return a reference to it
   ByteTexture& AddByteTexData(std::string const& p_name);
 
   //Create a FloatTexture and return a reference to it
   FloatTexture& AddFloatTexData(std::string const& p_name);
+
+  //Create a UShortTexture and return a reference to it
+  UShortTexture& AddUShortTexData(std::string const& p_name);
 
   void SetUniformData(std::string const& p_uniform, std::string const& p_attributeKey);
 
@@ -222,6 +229,8 @@ public:
 
   FloatTexture const& GetFloatTexture(std::string const& p_name) const;
 
+  UShortTexture const& GetUShortTexture(std::string const& p_name) const;
+
   bool GetUniformData(std::string const& p_uniform, std::string& p_attributeKey) const;
 
   StringMap const& GetUniforms() const;
@@ -236,6 +245,8 @@ public:
 
   bool HasFloatTexData(std::string const& p_name) const;
 
+  bool HasUShortTexData(std::string const& p_name) const;
+
 private:
 
   std::string m_name;
@@ -245,6 +256,9 @@ private:
 
   typedef std::unordered_map<std::string, FloatTexture>  FloatTextureMap;
   FloatTextureMap m_floatTextures;
+
+  typedef std::unordered_map<std::string, UShortTexture>  UShortTextureMap;
+  UShortTextureMap m_ushortTextures;
 
   typedef std::unordered_map<std::string, float>  FloatMap;
   FloatMap m_floats;

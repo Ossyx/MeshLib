@@ -44,6 +44,11 @@ void Material::SetData(std::string const& p_name, Material::FloatTexture const& 
   m_floatTextures[p_name] = p_data;
 }
 
+void Material::SetData(std::string const& p_name, Material::UShortTexture const& p_data)
+{
+  m_ushortTextures[p_name] = p_data;
+}
+
 void Material::SetUniformData(std::string const& p_uniform, std::string const& p_attributeKey)
 {
   m_uniforms[p_uniform] = p_attributeKey;
@@ -91,6 +96,13 @@ Material::FloatTexture const& Material::GetFloatTexture(std::string const& p_nam
   return it->second;
 }
 
+Material::UShortTexture const& Material::GetUShortTexture(std::string const& p_name) const
+{
+  UShortTextureMap::const_iterator it = m_ushortTextures.find(p_name);
+  assert(it != m_ushortTextures.cend());
+  return it->second;
+}
+
 bool Material::HasFloatData(std::string const& p_name) const
 {
   return m_floats.find(p_name) != m_floats.end();
@@ -107,6 +119,11 @@ bool Material::HasUCharTexData(std::string const& p_name) const
 bool Material::HasFloatTexData(std::string const& p_name) const
 {
   return m_floatTextures.find(p_name) != m_floatTextures.end();
+}
+
+bool Material::HasUShortTexData(std::string const& p_name) const
+{
+  return m_ushortTextures.find(p_name) != m_ushortTextures.end();
 }
 
 bool Material::GetUniformData(std::string const& p_uniform, std::string& p_attributeKey) const
@@ -142,6 +159,13 @@ Material::FloatTexture& Material::AddFloatTexData(std::string const& p_name)
   FloatTextureMap::const_iterator it = m_floatTextures.find(p_name);
   assert(it == m_floatTextures.cend());
   return m_floatTextures[p_name];
+}
+
+Material::UShortTexture& Material::AddUShortTexData(std::string const& p_name)
+{
+  UShortTextureMap::const_iterator it = m_ushortTextures.find(p_name);
+  assert(it == m_ushortTextures.cend());
+  return m_ushortTextures[p_name];
 }
 
 }

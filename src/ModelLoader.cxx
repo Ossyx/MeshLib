@@ -255,6 +255,10 @@ void ModelLoader::LoadJsonAttribute(Material& p_material, Json::Value const& p_v
     {
       AttributeAsByteTexture(p_material, p_value);
     }
+    else if (attType == "UShortTex")
+    {
+      AttributeAsUShortTexture(p_material, p_value);
+    }
     else
     {
       rxLogError("Unsupported attribute type : "<< attType);
@@ -294,16 +298,32 @@ void ModelLoader::AttributeAsByteTexture(Material& p_material, Json::Value const
   rxLogInfo("Loading "<< name <<" texture "<< value);
 
   Texture<unsigned char>& tex = p_material.AddByteTexData(name);
-  LoadTextureFromFile(m_directory, value, tex);
+  LoadTextureFromFile<unsigned char>(m_directory, value, tex);
 }
 
+void ModelLoader::AttributeAsUShortTexture(Material& p_material, Json::Value const& p_value)
+{
+  std::string name = p_value["name"].asString();
+  std::string value = p_value["value"].asString();;
+  rxLogInfo("Loading "<< name <<" texture "<< value);
+
+  Texture<unsigned short>& tex = p_material.AddUShortTexData(name);
+  LoadTextureFromFile<unsigned short>(m_directory, value, tex);
+}
+
+template <typename T>
 void ModelLoader::LoadTextureFromFile(std::string const& p_directory, std::string const& p_fileName,
-  Texture<unsigned char>& p_texture)
+  Texture<T>& p_texture)
 {
   std::string path = m_directory + "/" + p_fileName;
   std::replace( path.begin(), path.end(), '\\', '/');
-  cimg::CImg<unsigned char> image(path.c_str());
+  cimg::CImg<T> image(path.c_str());
   image.mirror('y');
+  rxLogInfo("Loading "<<path<<" with spectrum " << image.spectrum());
+//   cimg::CImgDisplay main_disp(image,"Click a point");
+//   while (!main_disp.is_closed()) {
+//     main_disp.wait();
+//   }
   unsigned int pixelCount = image.width() * image.height();
   assert(image.spectrum() == 1 || image.spectrum() == 3 || image.spectrum() == 4);
   if (image.spectrum() == 1)//B&W
