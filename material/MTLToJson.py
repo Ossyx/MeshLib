@@ -101,12 +101,14 @@ UniformMap = dict()
 UniformMap["Ka"] = "ambient_color"
 UniformMap["Kd"] = "diffuse_color"
 UniformMap["Ks"] = "specular_color"
-UniformMap["map_Kd"] = "texture1"
-UniformMap["map_Ka"] = "texture2"
-UniformMap["map_Ks"] = "texture3"
-UniformMap["map_bump"] = "texture4"
-UniformMap["map_d"] = "texture5"
-UniformMap["map_normal"] = "texture6"
+UniformMap["map_Kd"] = "map_diffuse"
+UniformMap["map_Ka"] = "map_ambient"
+UniformMap["map_Ks"] = "map_specular"
+UniformMap["map_bump"] = "map_bump"
+UniformMap["map_d"] = "map_displacement"
+UniformMap["map_normal"] = "map_normal"
+UniformMap["map_ao"] = "map_ao"
+UniformMap["map_roughness"] = "map_roughness"
 
 FloatToParse = ["Ns", "Ni", "d", "Tr", "illum"]
 Vec3ToParse = ["Tf", "Ka", "Kd", "Ks", "Ke"]
@@ -121,19 +123,17 @@ with open(mtl_filepath) as fp:
      line = line[:-1]
      if line.startswith("newmtl"):
        currentMtlName = line[7:]
-       print currentMtlName
+       print(currentMtlName)
        newMTL = Material(currentMtlName, UniformMap)
        materialList.append(newMTL)
        currentMaterial = newMTL
 
      elif currentMaterial != None and len(line) > 0 :
        #First char is a tab
-       line = line[1:]
-       #print line.split(' ', 1)
+       if line[0] == '\t':
+         line = line[1:]
        attributeName = line.split(' ', 1)[0]
-       #print attributeName
        attributeValue = line.split(' ', 1)[1]
-       #print attributeValue
        if attributeName in FloatToParse:
          currentMaterial.floatAttributes[attributeName] = ParseFloat(attributeValue)
        if attributeName in Vec3ToParse:
