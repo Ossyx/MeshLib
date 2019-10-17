@@ -49,8 +49,6 @@ private:
 
   void LoadFromAiMesh(Model& p_model, aiMesh* p_aiMesh);
 
-  void LoadFromAiMaterial(Model& p_model, aiMaterial* p_aiMaterial);
-
   //Json loader
   void LoadFromJsonMaterial(Model& p_model, std::string const& p_directory,
   std::string const& p_objFile);
@@ -63,21 +61,16 @@ private:
 
   void AttributeAsByteTexture(Material& p_material, Json::Value const& p_value);
 
-  void LoadColors(aiMaterial* p_aiMaterial, Material& p_mat);
-
-  void LoadTextures(aiMaterial* p_aiMaterial, Material& p_mat);
-
   void LoadTextureFromFile(std::string const& p_directory, std::string const& p_fileName,
     Texture<unsigned char>& p_texture);
 
-  void LoadAndComputeNormalMap(std::string const& p_directory, std::string const& p_fileName,
-    Texture<unsigned char>& p_texture);
+  bool FindAndGetJsonMaterialFile(std::string const& p_objFilePath,
+    std::ifstream& p_inputStream);
 
   typedef std::map<std::string, Model*> ModelMap;
   ModelMap m_modelMap;
 
   std::string m_directory;
-
 };
 
 }

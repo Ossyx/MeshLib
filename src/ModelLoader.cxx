@@ -192,32 +192,17 @@ void ModelLoader::LoadFromAiMesh(Model& p_model, aiMesh* p_aiMesh)
 void ModelLoader::LoadFromJsonMaterial(Model& p_model, std::string const& p_directory,
   std::string const& p_objFile)
 {
-  std::string jsonMatFile = p_objFile;
-  size_t index;
-  index = jsonMatFile.find(".obj");
-  assert(index != std::string::npos);
-  jsonMatFile.replace(index, 4, ".json");
-
-  std::ifstream input;
-  input.open(jsonMatFile.c_str());
-  if (input.is_open())
-  {
-    rxLogInfo("Reading material file "<<jsonMatFile);
-  }
-  else
-  {
-    rxLogError("Cannot find json material file "<<jsonMatFile);
-    return;
-  }
+  std::ifstream inputStreamJsonMap;
+  assert(FindAndGetJsonMaterialFile(p_objFile, inputStreamJsonMap) == true);
 
   Json::Value root;   // will contains the root value after parsing.
   Json::Reader reader;
-  bool parsingSuccessful = reader.parse(input, root );
+  bool parsingSuccessful = reader.parse(inputStreamJsonMap, root );
   if (parsingSuccessful == false)
   {
       // report to the user the failure and their locations in the document.
     rxLogError("Fail to parse material file : "<<reader.getFormattedErrorMessages());
-    return;
+    assert(false);
   }
 
   //Each thread needs material key, root data and p_model and a mutex for p_model
@@ -310,69 +295,6 @@ void ModelLoader::AttributeAsByteTexture(Material& p_material, Json::Value const
 
   Texture<unsigned char>& tex = p_material.AddByteTexData(name);
   LoadTextureFromFile(m_directory, value, tex);
-  //p_material.SetData(name, tex);
-}
-
-void ModelLoader::LoadFromAiMaterial(Model& p_model, aiMaterial* p_aiMaterial)
-{
-  aiString name;
-  p_aiMaterial->Get(AI_MATKEY_NAME, name);
-  rxLogInfo("-- Loading material "<<name.C_Str());
-  Material* mat = new Material();
-  LoadColors(p_aiMaterial, *mat);
-  LoadTextures(p_aiMaterial, *mat);
-  p_model.AddMaterial(mat, name.C_Str());
-}
-
-void ModelLoader::LoadColors(aiMaterial* p_aiMaterial, Material& p_mat)
-{
-  auto LoadColorType = [p_aiMaterial, this](const char* p_Key, unsigned int p_type,
-    unsigned int p_idx, std::string const& p_parameterName, Material& p_oMat)
-  {
-    aiColor3D color (0.f,0.f,0.f);
-    if (p_aiMaterial->Get(p_Key, p_type, p_idx, color) == AI_SUCCESS)
-    {
-      rxLogInfo("Loading "<<p_parameterName <<"("<<color.r<<","<<color.g<<","<<color.b<<")");
-      p_oMat.SetData(p_parameterName, glm::vec3(color.b, color.g, color.r));
-    }
-  };
-
-  LoadColorType(AI_MATKEY_COLOR_AMBIENT, "Ambient", p_mat);
-  LoadColorType(AI_MATKEY_COLOR_DIFFUSE, "Diffuse", p_mat);
-  LoadColorType(AI_MATKEY_COLOR_SPECULAR, "Specular", p_mat);
-  LoadColorType(AI_MATKEY_COLOR_EMISSIVE, "Emissive", p_mat);
-  LoadColorType(AI_MATKEY_COLOR_TRANSPARENT, "Transparent", p_mat);
-  LoadColorType(AI_MATKEY_COLOR_REFLECTIVE, "Reflective", p_mat);
-}
-
-void ModelLoader::LoadTextures(aiMaterial* p_aiMaterial, Material& p_mat)
-{
-  auto LoadTextureType = [p_aiMaterial, this](aiTextureType p_type,
-    std::string const& p_parameterName, Material& p_oMat )
-  {
-    aiString texturePath;
-    if (p_aiMaterial->GetTextureCount(p_type) > 0
-    && p_aiMaterial->GetTexture(p_type, 0, &texturePath) == AI_SUCCESS)
-    {
-      //TODO Do not assume textures will only be rgb
-      rxLogInfo("Loading "<< p_parameterName <<" texture "<<texturePath.C_Str());
-      Texture<unsigned char>& tex = p_oMat.AddByteTexData(p_parameterName);
-      LoadTextureFromFile(m_directory, texturePath.C_Str(), tex);
-      //p_oMat.SetData(p_parameterName, tex);
-    }
-  };
-
-  LoadTextureType(aiTextureType_AMBIENT, "Ambient", p_mat);
-  LoadTextureType(aiTextureType_DIFFUSE, "Diffuse", p_mat);
-  LoadTextureType(aiTextureType_SPECULAR, "Specular", p_mat);
-  LoadTextureType(aiTextureType_EMISSIVE, "Emissive", p_mat);
-  LoadTextureType(aiTextureType_HEIGHT, "Height", p_mat);
-  LoadTextureType(aiTextureType_NORMALS, "Normals", p_mat);
-  LoadTextureType(aiTextureType_SHININESS, "Shininess", p_mat);
-  LoadTextureType(aiTextureType_OPACITY, "Opacity", p_mat);
-  LoadTextureType(aiTextureType_DISPLACEMENT, "Displacement", p_mat);
-  LoadTextureType(aiTextureType_LIGHTMAP, "Lightmap", p_mat);
-  LoadTextureType(aiTextureType_REFLECTION, "Reflection", p_mat);
 }
 
 void ModelLoader::LoadTextureFromFile(std::string const& p_directory, std::string const& p_fileName,
@@ -383,18 +305,25 @@ void ModelLoader::LoadTextureFromFile(std::string const& p_directory, std::strin
   cimg::CImg<unsigned char> image(path.c_str());
   image.mirror('y');
   unsigned int pixelCount = image.width() * image.height();
-  assert(image.spectrum() == 1 || image.spectrum() == 3);
-  if (image.spectrum() == 1)
+  assert(image.spectrum() == 1 || image.spectrum() == 3 || image.spectrum() == 4);
+  if (image.spectrum() == 1)//B&W
   {
     p_texture.Initialize(path, (unsigned int)image.width(),
      (unsigned int)image.height(),
      image.data());
   }
-  else if (image.spectrum() == 3)
+  else if (image.spectrum() == 3)//RGB
   {
     p_texture.Initialize(path, (unsigned int)image.width(),
      (unsigned int)image.height(),
      image.data(), image.data(pixelCount), image.data(2*pixelCount));
+  }
+  else if(image.spectrum() == 4)//RGBA
+  {
+    p_texture.Initialize(path, (unsigned int)image.width(),
+     (unsigned int)image.height(),
+     image.data(), image.data(pixelCount),
+     image.data(2*pixelCount), image.data(3*pixelCount));
   }
 }
 
@@ -408,6 +337,30 @@ Model* ModelLoader::FindModel(std::string const& p_name)
   else
   {
     return NULL;
+  }
+}
+
+bool ModelLoader::FindAndGetJsonMaterialFile(std::string const& p_objFilePath,
+  std::ifstream& p_inputStream)
+{
+  std::string jsonMatFile = p_objFilePath;
+  size_t index = jsonMatFile.find(".obj");
+  if(index == std::string::npos)
+  {
+    rxLogError("Cannot find json material file from obj " << p_objFilePath);
+    return false;
+  }
+  jsonMatFile.replace(index, 4, ".json");
+  p_inputStream.open(jsonMatFile.c_str());
+  if (p_inputStream.is_open())
+  {
+    rxLogInfo("Reading material file " << jsonMatFile);
+    return true;
+  }
+  else
+  {
+    rxLogError("Cannot find json material file " << jsonMatFile);
+    return false;
   }
 }
 
