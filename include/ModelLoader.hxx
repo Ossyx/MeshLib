@@ -17,6 +17,7 @@
 #include <jsoncpp/json/value.h>
 #include <jsoncpp/json/reader.h>
 
+#define cimg_use_png
 #include <CImg.h>
 
 #include "Mesh.hxx"

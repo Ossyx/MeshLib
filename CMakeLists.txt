@@ -12,6 +12,8 @@ find_package(CImg REQUIRED)
 find_package(JsonCpp REQUIRED)
 #glm is a dependency
 find_package(glm REQUIRED)
+#libPNG for CImg to have png full support
+find_package(PNG REQUIRED)
 
 include_directories(${CMAKE_SOURCE_DIR}/include ${glm_DIR} ${CImg_INCLUDE_DIR}
 ${JsonCpp_INCLUDE_DIR})
@@ -27,7 +29,7 @@ add_library(MeshLib SHARED
   ${CMAKE_SOURCE_DIR}/src/ModelLoader.cxx)
 
 target_include_directories(MeshLib PUBLIC ${ASSIMP_INCLUDE_DIRS})
-target_link_libraries(MeshLib ${ASSIMP_LIBRARIES} ${CImg_LIBRARIES} ${JsonCpp_LIBRARY})
+target_link_libraries(MeshLib ${ASSIMP_LIBRARIES} ${CImg_LIBRARIES} ${JsonCpp_LIBRARY} ${PNG_LIBRARY_RELEASE})
 
 install(TARGETS MeshLib DESTINATION lib)
 

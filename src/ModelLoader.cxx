@@ -7,7 +7,6 @@
 #include <fstream>
 #include <algorithm>
 
-#include <CImg.h>
 #include <assimp/material.h>
 #include <glm/mat4x4.hpp> // glm::mat4
 
