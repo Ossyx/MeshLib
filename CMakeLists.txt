@@ -26,7 +26,8 @@ add_library(MeshLib SHARED
   ${CMAKE_SOURCE_DIR}/src/Mesh.cxx
   ${CMAKE_SOURCE_DIR}/src/Material.cxx
   ${CMAKE_SOURCE_DIR}/src/Model.cxx
-  ${CMAKE_SOURCE_DIR}/src/ModelLoader.cxx)
+  ${CMAKE_SOURCE_DIR}/src/ModelLoader.cxx
+  ${CMAKE_SOURCE_DIR}/src/Primitives.cxx)
 
 target_include_directories(MeshLib PUBLIC ${ASSIMP_INCLUDE_DIRS})
 target_link_libraries(MeshLib ${ASSIMP_LIBRARIES} ${CImg_LIBRARIES} ${JsonCpp_LIBRARY} ${PNG_LIBRARY_RELEASE})

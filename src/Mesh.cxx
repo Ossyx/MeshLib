@@ -10,6 +10,10 @@
 namespace rx
 {
 
+Mesh::Mesh()
+{
+}
+
 Mesh::Mesh(float* p_vPtr, float* p_nPtr, unsigned int* p_tIdPtr, float* p_uvCoords,
   float* p_tangentPtr, float* p_bitangentPtr, unsigned int p_vertexCount,
   unsigned int p_normalCount, unsigned int p_tangentCount, unsigned int p_bitangentCount,
