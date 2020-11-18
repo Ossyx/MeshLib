@@ -12,11 +12,7 @@ Model::Model()
 
 Model::~Model()
 {
-  //Destroy the m_meshes
-  for (unsigned int i=0; i < m_meshes.size(); ++i)
-  {
-    delete m_meshes[i];
-  }
+  rxLogWarning("Deleting Model "<< m_name);
 }
 
 void Model::SetName(std::string const& p_name)
@@ -24,7 +20,7 @@ void Model::SetName(std::string const& p_name)
   m_name = p_name;
 }
 
-void Model::AddMesh(Mesh* p_mesh)
+void Model::AddMesh(MeshPtr p_mesh)
 {
   m_meshes.push_back(p_mesh);
 }
@@ -39,7 +35,7 @@ unsigned int Model::GetMeshCount()
   return m_meshes.size();
 }
 
-Mesh* Model::GetMesh(unsigned int p_idx)
+Model::MeshPtr Model::GetMesh(unsigned int p_idx)
 {
   assert(p_idx < m_meshes.size());
   return m_meshes[p_idx];

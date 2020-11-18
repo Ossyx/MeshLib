@@ -20,10 +20,12 @@ public:
   Model();
 
   ~Model();
+  
+  using MeshPtr = std::shared_ptr<Mesh>;
 
   void SetName(std::string const& p_name);
 
-  void AddMesh(Mesh* p_mesh);
+  void AddMesh(MeshPtr p_mesh);
 
   void AddMaterial(Material* p_material, std::string const& p_name);
 
@@ -31,7 +33,7 @@ public:
 
   unsigned int GetMeshCount();
 
-  Mesh* GetMesh(unsigned int p_idx);
+  MeshPtr GetMesh(unsigned int p_idx);
 
   Material* GetMaterial(std::string const& p_name);
 
@@ -49,7 +51,7 @@ private:
 
   unsigned int m_meshCount;
 
-  std::vector<Mesh*> m_meshes;
+  std::vector<MeshPtr> m_meshes;
 
   typedef std::map<std::string, Material*> MaterialMap;
   MaterialMap m_materials;

@@ -8,6 +8,7 @@
 #include <string>
 #include <unordered_map>
 #include <map>
+#include <filesystem>
 
 #include <glm/vec3.hpp> // glm::vec3
 #include <glm/vec4.hpp> // glm::vec4
@@ -190,6 +191,8 @@ public:
   typedef std::unordered_map<std::string, std::string> StringMap;
 
   void SetName(std::string const& p_name);
+  
+  void SetDirectory(std::filesystem::path const& p_path);
 
   void SetData(std::string const& p_name, float p_data);
 
@@ -218,6 +221,8 @@ public:
   void SetShaderName(std::string const& p_name);
 
   std::string GetName() const;
+  
+  std::filesystem::path GetDirectory() const;
 
   bool GetData(std::string const& p_name, float& p_data) const;
 
@@ -250,6 +255,8 @@ public:
 private:
 
   std::string m_name;
+  
+  std::filesystem::path m_directory;
 
   typedef std::map<std::string, ByteTexture>  ByteTextureMap;
   ByteTextureMap m_ucharTextures;

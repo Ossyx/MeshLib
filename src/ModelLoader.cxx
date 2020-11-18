@@ -6,6 +6,8 @@
 
 #include <fstream>
 #include <algorithm>
+#include <vector>
+#include <thread>
 
 #include <assimp/material.h>
 #include <glm/mat4x4.hpp> // glm::mat4
@@ -24,38 +26,27 @@ ModelLoader::ModelLoader()
 
 ModelLoader::~ModelLoader()
 {
-  ModelMap::iterator it = m_modelMap.begin();
-  for (; it != m_modelMap.end(); ++it)
-  {
-    rxLogInfo("Unloading model "<<it->first<<"...");
-    delete it->second;
-  }
 }
 
-void ModelLoader::LoadOBJModel(
-  std::string const& p_directory,
-  std::string const& p_file,
+ModelLoader::ModelPtr ModelLoader::LoadOBJModel(
+  std::filesystem::path const& p_file,
   std::string const& p_name)
 {
   unsigned int flag = aiProcess_Triangulate;
   flag |= aiProcess_GenSmoothNormals;
   flag |= aiProcess_JoinIdenticalVertices;
   flag |= aiProcess_CalcTangentSpace;
-
-  m_directory = p_directory;
-  std::string filepath = m_directory;
-  filepath += "/";
-  filepath += p_file;
-  const aiScene* scene = aiImportFile(filepath.c_str(), flag);
+  
+  const aiScene* scene = aiImportFile(p_file.c_str(), flag);
 
   if (scene == NULL)
   {
     rxLogError("Error : "<< aiGetErrorString());
-    return;
+    return nullptr;
   }
 
-  rxLogInfo("Loading model "<<p_name<<" from file "<< filepath);
-  Model* loadedModel = new Model();
+  rxLogInfo("Loading model "<<p_name<<" from file "<< p_file);
+  ModelPtr loadedModel = std::make_shared<Model>();
   loadedModel->SetName(p_name);
 
   std::map<unsigned int, std::string> materialMapping;
@@ -69,27 +60,37 @@ void ModelLoader::LoadOBJModel(
     }
   }
 
-  LoadFromJsonMaterial(*loadedModel, p_directory, filepath);
-
+  std::filesystem::path jsonFilePath = p_file;
+  jsonFilePath.replace_extension(".json");
+  
+  
+  if( std::filesystem::exists(jsonFilePath) )
+  {
+    rxLogInfo("Loading materials from file "<< jsonFilePath);
+    LoadFromJsonMaterial(*loadedModel, jsonFilePath);
+  }
+  else
+  {
+    rxLogWarning("No json material file available");
+  }
+  
   for (int meshIdx = 0; meshIdx < scene->mNumMeshes; ++meshIdx)
   {
-    LoadFromAiMesh(*loadedModel, scene->mMeshes[meshIdx]);
+    rxLogInfo("-- Loading mesh for model "<<loadedModel->GetName()<<" with "
+      <<scene->mMeshes[meshIdx]->mNumVertices<<" vertices "
+      <<"and "<<scene->mMeshes[meshIdx]->mNumFaces<<" faces.");
+    MeshPtr mesh = LoadFromAiMesh(scene->mMeshes[meshIdx]);
+    loadedModel->AddMesh(mesh);
     loadedModel->AddMeshMaterialLink(meshIdx,
       materialMapping[scene->mMeshes[meshIdx]->mMaterialIndex]);
   }
 
-  m_modelMap[p_name] = loadedModel;
-
-  //Computing the bounding box
   aiReleaseImport(scene);
+  return loadedModel;
 }
 
-void ModelLoader::LoadFromAiMesh(Model& p_model, aiMesh* p_aiMesh)
+ModelLoader::MeshPtr ModelLoader::LoadFromAiMesh(aiMesh* p_aiMesh)
 {
-  rxLogInfo("-- Loading mesh for model "<<p_model.GetName()<<" with "
-    <<p_aiMesh->mNumVertices<<" vertices "
-    <<"and "<<p_aiMesh->mNumFaces<<" faces.");
-
   float* vertexPtr = new float[p_aiMesh->mNumVertices*3];
   unsigned int* triangleIdxPtr = new unsigned int[p_aiMesh->mNumFaces*3];
 
@@ -164,12 +165,12 @@ void ModelLoader::LoadFromAiMesh(Model& p_model, aiMesh* p_aiMesh)
     if (p_aiMesh->mFaces->mNumIndices < 3)
     {
       rxLogError("Error : Faces with  less than 3 indices not supported.");
-      return;
+      return nullptr;
     }
     if (p_aiMesh->mFaces->mNumIndices > 3)
     {
       rxLogError("Error : Faces with more than 3 indices not supported.");
-      return;
+      return nullptr;
     }
     aiFace const& assimpFace = p_aiMesh->mFaces[numTri];
     triangleIdxPtr[idx + 0] = assimpFace.mIndices[0];
@@ -177,22 +178,23 @@ void ModelLoader::LoadFromAiMesh(Model& p_model, aiMesh* p_aiMesh)
     triangleIdxPtr[idx + 2] = assimpFace.mIndices[2];
     idx += 3;
   }
-
-  //Load
-
-  Mesh* m = new Mesh(vertexPtr, normalPtr, triangleIdxPtr, uvCoordsPtr, tangentPtr,
+  
+  auto m = std::make_shared<Mesh>(vertexPtr, normalPtr, triangleIdxPtr, uvCoordsPtr, tangentPtr,
     bitangentPtr,p_aiMesh->mNumVertices, p_aiMesh->mNumVertices, p_aiMesh->mNumVertices,
     p_aiMesh->mNumVertices, p_aiMesh->mNumFaces, p_aiMesh->mNumVertices);
 
-  p_model.AddMesh(m);
-  return;
+  return m;
 }
 
-void ModelLoader::LoadFromJsonMaterial(Model& p_model, std::string const& p_directory,
-  std::string const& p_objFile)
+void ModelLoader::LoadFromJsonMaterial(Model& p_model, std::filesystem::path const& p_jsonFile)
 {
   std::ifstream inputStreamJsonMap;
-  assert(FindAndGetJsonMaterialFile(p_objFile, inputStreamJsonMap) == true);
+  inputStreamJsonMap.open(p_jsonFile.c_str());
+  if (inputStreamJsonMap.is_open() == false)
+  {
+    rxLogError("Cannot open json material file " << p_jsonFile);
+    assert(false);
+  }
 
   Json::Value root;   // will contains the root value after parsing.
   Json::Reader reader;
@@ -211,10 +213,11 @@ void ModelLoader::LoadFromJsonMaterial(Model& p_model, std::string const& p_dire
   for (int i = 0; i < materialKeys.size(); ++i)
   {
     std::string materialKey = materialKeys[i];
-    matThreads.push_back(std::thread( [this, &model_mutex, materialKey, &root, &p_model]
+    auto func = [&model_mutex, materialKey, &root, &p_model, &p_jsonFile]
       {
         Material* mat = new Material();
         mat->SetName(materialKey);
+        mat->SetDirectory(p_jsonFile.parent_path());
         Json::Value matAttributes = root[materialKey]["Attributes"];
         Json::Value matShader = root[materialKey]["Shader"];
 
@@ -226,8 +229,8 @@ void ModelLoader::LoadFromJsonMaterial(Model& p_model, std::string const& p_dire
         model_mutex.lock();
         p_model.AddMaterial(mat, materialKey);
         model_mutex.unlock();
-      }
-    ));
+      };
+    matThreads.push_back(std::thread(func));
   }
 
   for (int i = 0; i < matThreads.size(); ++i)
@@ -297,7 +300,7 @@ void ModelLoader::AttributeAsByteTexture(Material& p_material, Json::Value const
   rxLogInfo("Loading "<< name <<" texture "<< value);
 
   Texture<unsigned char>& tex = p_material.AddByteTexData(name);
-  LoadTextureFromFile<unsigned char>(m_directory, value, tex);
+  LoadTextureFromFile<unsigned char>(p_material.GetDirectory() / value, tex);
 }
 
 void ModelLoader::AttributeAsUShortTexture(Material& p_material, Json::Value const& p_value)
@@ -307,18 +310,16 @@ void ModelLoader::AttributeAsUShortTexture(Material& p_material, Json::Value con
   rxLogInfo("Loading "<< name <<" texture "<< value);
 
   Texture<unsigned short>& tex = p_material.AddUShortTexData(name);
-  LoadTextureFromFile<unsigned short>(m_directory, value, tex);
+  LoadTextureFromFile<unsigned short>(p_material.GetDirectory() / value, tex);
 }
 
 template <typename T>
-void ModelLoader::LoadTextureFromFile(std::string const& p_directory, std::string const& p_fileName,
+void ModelLoader::LoadTextureFromFile(std::filesystem::path const& p_path,
   Texture<T>& p_texture)
 {
-  std::string path = m_directory + "/" + p_fileName;
-  std::replace( path.begin(), path.end(), '\\', '/');
-  cimg::CImg<T> image(path.c_str());
+  cimg::CImg<T> image(p_path.c_str());
   image.mirror('y');
-  rxLogInfo("Loading "<<path<<" with spectrum " << image.spectrum());
+  rxLogInfo("Loading "<<p_path<<" with spectrum " << image.spectrum());
 //   cimg::CImgDisplay main_disp(image,"Click a point");
 //   while (!main_disp.is_closed()) {
 //     main_disp.wait();
@@ -327,59 +328,22 @@ void ModelLoader::LoadTextureFromFile(std::string const& p_directory, std::strin
   assert(image.spectrum() == 1 || image.spectrum() == 3 || image.spectrum() == 4);
   if (image.spectrum() == 1)//B&W
   {
-    p_texture.Initialize(path, (unsigned int)image.width(),
+    p_texture.Initialize(p_path, (unsigned int)image.width(),
      (unsigned int)image.height(),
      image.data());
   }
   else if (image.spectrum() == 3)//RGB
   {
-    p_texture.Initialize(path, (unsigned int)image.width(),
+    p_texture.Initialize(p_path, (unsigned int)image.width(),
      (unsigned int)image.height(),
      image.data(), image.data(pixelCount), image.data(2*pixelCount));
   }
   else if(image.spectrum() == 4)//RGBA
   {
-    p_texture.Initialize(path, (unsigned int)image.width(),
+    p_texture.Initialize(p_path, (unsigned int)image.width(),
      (unsigned int)image.height(),
      image.data(), image.data(pixelCount),
      image.data(2*pixelCount), image.data(3*pixelCount));
-  }
-}
-
-Model* ModelLoader::FindModel(std::string const& p_name)
-{
-  ModelMap::iterator it = m_modelMap.find(p_name);
-  if (it != m_modelMap.end())
-  {
-    return it->second;
-  }
-  else
-  {
-    return NULL;
-  }
-}
-
-bool ModelLoader::FindAndGetJsonMaterialFile(std::string const& p_objFilePath,
-  std::ifstream& p_inputStream)
-{
-  std::string jsonMatFile = p_objFilePath;
-  size_t index = jsonMatFile.find(".obj");
-  if(index == std::string::npos)
-  {
-    rxLogError("Cannot find json material file from obj " << p_objFilePath);
-    return false;
-  }
-  jsonMatFile.replace(index, 4, ".json");
-  p_inputStream.open(jsonMatFile.c_str());
-  if (p_inputStream.is_open())
-  {
-    rxLogInfo("Reading material file " << jsonMatFile);
-    return true;
-  }
-  else
-  {
-    rxLogError("Cannot find json material file " << jsonMatFile);
-    return false;
   }
 }
 

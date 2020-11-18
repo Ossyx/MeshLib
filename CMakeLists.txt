@@ -1,8 +1,11 @@
 cmake_minimum_required(VERSION 2.6)
 project(MeshLib)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS ON)
+
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
-set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install")
 
 #Assimp is a dependency
 find_package(Assimp REQUIRED)
@@ -14,8 +17,11 @@ find_package(JsonCpp REQUIRED)
 find_package(glm REQUIRED)
 #libPNG for CImg to have png full support
 find_package(PNG REQUIRED)
+#libJPEG for CImg to have jpeg full support
+find_package(JPEG REQUIRED)
 
-include_directories(${CMAKE_SOURCE_DIR}/include ${glm_DIR} ${CImg_INCLUDE_DIR}
+message(GLM : ${GLM_INCLUDE_DIRS})
+include_directories(${CMAKE_SOURCE_DIR}/include ${GLM_INCLUDE_DIRS} ${CImg_INCLUDE_DIR}
 ${JsonCpp_INCLUDE_DIR})
 
 file(GLOB_RECURSE headers
@@ -30,7 +36,7 @@ add_library(MeshLib SHARED
   ${CMAKE_SOURCE_DIR}/src/Primitives.cxx)
 
 target_include_directories(MeshLib PUBLIC ${ASSIMP_INCLUDE_DIRS})
-target_link_libraries(MeshLib ${ASSIMP_LIBRARIES} ${CImg_LIBRARIES} ${JsonCpp_LIBRARY} ${PNG_LIBRARY_RELEASE})
+target_link_libraries(MeshLib ${ASSIMP_LIBRARIES} ${CImg_LIBRARIES} ${JsonCpp_LIBRARY} ${PNG_LIBRARY_RELEASE} ${JPEG_LIBRARY_RELEASE})
 
 install(TARGETS MeshLib DESTINATION lib)
 

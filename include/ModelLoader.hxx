@@ -9,6 +9,7 @@
 #include <string>
 #include <thread>
 #include <mutex>
+#include <filesystem>
 
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
@@ -18,6 +19,7 @@
 #include <jsoncpp/json/reader.h>
 
 #define cimg_use_png
+#define cimg_use_jpeg
 #include <CImg.h>
 
 #include "Mesh.hxx"
@@ -35,46 +37,38 @@ public:
   ModelLoader();
 
   ~ModelLoader();
+  
+  using ModelPtr = std::shared_ptr<rx::Model>;
+  using MeshPtr = std::shared_ptr<rx::Mesh>;
 
-  void LoadOBJModel(std::string const& p_directory, std::string const& p_file,
+  static ModelPtr LoadOBJModel(std::filesystem::path const& p_file,
     std::string const& p_name);
-
-  Model* FindModel(std::string const& p_meshName);
 
   static void ComputeNormalMap(cimg_library::CImg<unsigned char> const& p_bumpMap,
     Texture<unsigned char>& p_normalMap);
+  
+  template <typename T>
+  static void LoadTextureFromFile(std::filesystem::path const& p_path,
+    Texture<T>& p_texture);
 
 private:
 
   ModelLoader(ModelLoader const&);
 
-  void LoadFromAiMesh(Model& p_model, aiMesh* p_aiMesh);
+  static MeshPtr LoadFromAiMesh(aiMesh* p_aiMesh);
 
   //Json loader
-  void LoadFromJsonMaterial(Model& p_model, std::string const& p_directory,
-  std::string const& p_objFile);
+  static void LoadFromJsonMaterial(Model& p_model, std::filesystem::path const& p_jsonFile);
 
-  void LoadJsonAttribute(Material& p_material, Json::Value const& p_value);
+  static void LoadJsonAttribute(Material& p_material, Json::Value const& p_value);
 
-  void AttributeAsFloat(Material& p_material, Json::Value const& p_value);
+  static void AttributeAsFloat(Material& p_material, Json::Value const& p_value);
 
-  void AttributeAsVec3(Material& p_material, Json::Value const& p_value);
+  static void AttributeAsVec3(Material& p_material, Json::Value const& p_value);
 
-  void AttributeAsByteTexture(Material& p_material, Json::Value const& p_value);
+  static void AttributeAsByteTexture(Material& p_material, Json::Value const& p_value);
 
-  void AttributeAsUShortTexture(Material& p_material, Json::Value const& p_value);
-
-  template <typename T>
-  void LoadTextureFromFile(std::string const& p_directory, std::string const& p_fileName,
-    Texture<T>& p_texture);
-
-  bool FindAndGetJsonMaterialFile(std::string const& p_objFilePath,
-    std::ifstream& p_inputStream);
-
-  typedef std::map<std::string, Model*> ModelMap;
-  ModelMap m_modelMap;
-
-  std::string m_directory;
+  static void AttributeAsUShortTexture(Material& p_material, Json::Value const& p_value);
 };
 
 }

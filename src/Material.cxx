@@ -19,9 +19,19 @@ std::string Material::GetName() const
   return m_name;
 }
 
+std::filesystem::path Material::GetDirectory() const
+{
+  return m_directory;
+}
+
 void Material::SetName(std::string const& p_name)
 {
   m_name = p_name;
+}
+
+void Material::SetDirectory(const std::filesystem::path& p_path)
+{
+  m_directory = p_path;
 }
 
 void Material::SetData(std::string const& p_name, float p_data)
