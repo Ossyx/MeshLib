@@ -1,6 +1,6 @@
-/**
-* Copyright (C) 2019, Ossyx
-*/
+#ifndef COMMON_HXX
+#define COMMON_HXX
+
 #include <iostream>
 
 //#define MeshLibLog(log) std::cout<<x<<std::endl;
@@ -12,3 +12,5 @@
 #define rxLog(p_log, p_file, p_line, p_type) \
   std::cout <<p_file << ":("<< p_line<<")"<<" "\
   << p_type << " : " << p_log << std::endl;
+
+#endif
