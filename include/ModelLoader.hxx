@@ -40,6 +40,7 @@ public:
   
   using ModelPtr = std::shared_ptr<rx::Model>;
   using MeshPtr = std::shared_ptr<rx::Mesh>;
+  using MaterialPtr = std::shared_ptr<rx::Material>;
 
   static ModelPtr LoadOBJModel(std::filesystem::path const& p_file,
     std::string const& p_name);
@@ -50,15 +51,16 @@ public:
   template <typename T>
   static void LoadTextureFromFile(std::filesystem::path const& p_path,
     Texture<T>& p_texture);
+  
+  static std::vector<MaterialPtr> LoadMaterialCollection(std::filesystem::path const& p_jsonFile);
+  
+  static MaterialPtr LoadMaterial(Json::Value& pDescription, std::string const& pKey, std::filesystem::path const& pDirectory);
 
 private:
 
   ModelLoader(ModelLoader const&);
 
   static MeshPtr LoadFromAiMesh(aiMesh* p_aiMesh);
-
-  //Json loader
-  static void LoadFromJsonMaterial(Model& p_model, std::filesystem::path const& p_jsonFile);
 
   static void LoadJsonAttribute(Material& p_material, Json::Value const& p_value);
 

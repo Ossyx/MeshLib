@@ -22,12 +22,13 @@ public:
   ~Model();
   
   using MeshPtr = std::shared_ptr<Mesh>;
+  using MaterialPtr = std::shared_ptr<Material>;
 
   void SetName(std::string const& p_name);
 
   void AddMesh(MeshPtr p_mesh);
 
-  void AddMaterial(Material* p_material, std::string const& p_name);
+  void AddMaterial(MaterialPtr p_material, std::string const& p_name);
 
   void AddMeshMaterialLink(unsigned int p_meshId, std::string const& p_materialName);
 
@@ -35,9 +36,9 @@ public:
 
   MeshPtr GetMesh(unsigned int p_idx);
 
-  Material* GetMaterial(std::string const& p_name);
+  MaterialPtr GetMaterial(std::string const& p_name);
 
-  Material* GetMaterialForMesh(unsigned int p_meshId);
+  MaterialPtr GetMaterialForMesh(unsigned int p_meshId);
 
   std::string GetName();
 
@@ -53,7 +54,7 @@ private:
 
   std::vector<MeshPtr> m_meshes;
 
-  typedef std::map<std::string, Material*> MaterialMap;
+  typedef std::map<std::string, MaterialPtr> MaterialMap;
   MaterialMap m_materials;
 
   typedef std::map<unsigned int, std::string> UintStringMap;

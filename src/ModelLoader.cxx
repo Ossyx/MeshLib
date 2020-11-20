@@ -61,13 +61,17 @@ ModelLoader::ModelPtr ModelLoader::LoadOBJModel(
   }
 
   std::filesystem::path jsonFilePath = p_file;
-  jsonFilePath.replace_extension(".json");
-  
+  jsonFilePath.replace_extension(".json");  
   
   if( std::filesystem::exists(jsonFilePath) )
   {
     rxLogInfo("Loading materials from file "<< jsonFilePath);
-    LoadFromJsonMaterial(*loadedModel, jsonFilePath);
+    auto materials = LoadMaterialCollection(jsonFilePath);
+    
+    for(MaterialPtr mat : materials)
+    {
+      loadedModel->AddMaterial(mat, mat->GetName());
+    }
   }
   else
   {
@@ -186,7 +190,8 @@ ModelLoader::MeshPtr ModelLoader::LoadFromAiMesh(aiMesh* p_aiMesh)
   return m;
 }
 
-void ModelLoader::LoadFromJsonMaterial(Model& p_model, std::filesystem::path const& p_jsonFile)
+std::vector<ModelLoader::MaterialPtr> 
+ModelLoader::LoadMaterialCollection(std::filesystem::path const& p_jsonFile)
 {
   std::ifstream inputStreamJsonMap;
   inputStreamJsonMap.open(p_jsonFile.c_str());
@@ -205,6 +210,8 @@ void ModelLoader::LoadFromJsonMaterial(Model& p_model, std::filesystem::path con
     rxLogError("Fail to parse material file : "<<reader.getFormattedErrorMessages());
     assert(false);
   }
+  
+  std::vector<MaterialPtr> result;
 
   //Each thread needs material key, root data and p_model and a mutex for p_model
   std::mutex model_mutex;
@@ -213,21 +220,11 @@ void ModelLoader::LoadFromJsonMaterial(Model& p_model, std::filesystem::path con
   for (int i = 0; i < materialKeys.size(); ++i)
   {
     std::string materialKey = materialKeys[i];
-    auto func = [&model_mutex, materialKey, &root, &p_model, &p_jsonFile]
+    auto func = [&model_mutex, materialKey, &root, &result, &p_jsonFile]
       {
-        Material* mat = new Material();
-        mat->SetName(materialKey);
-        mat->SetDirectory(p_jsonFile.parent_path());
-        Json::Value matAttributes = root[materialKey]["Attributes"];
-        Json::Value matShader = root[materialKey]["Shader"];
-
-        mat->SetShaderName(matShader["name"].asString());
-        for (int attIdx = 0; attIdx < matAttributes.size(); ++attIdx)
-        {
-          LoadJsonAttribute(*mat, matAttributes[attIdx]);
-        }
+        MaterialPtr mat = LoadMaterial(root[materialKey], materialKey, p_jsonFile.parent_path());
         model_mutex.lock();
-        p_model.AddMaterial(mat, materialKey);
+        result.push_back(mat);
         model_mutex.unlock();
       };
     matThreads.push_back(std::thread(func));
@@ -237,6 +234,24 @@ void ModelLoader::LoadFromJsonMaterial(Model& p_model, std::filesystem::path con
   {
     matThreads[i].join();
   }
+  
+  return result;
+}
+
+ModelLoader::MaterialPtr ModelLoader::LoadMaterial(Json::Value& pDescription, std::string const& pKey, std::filesystem::path const& pDirectory)
+{
+  MaterialPtr mat = std::make_shared<Material>();
+  mat->SetName(pKey);
+  mat->SetDirectory(pDirectory);
+  Json::Value matAttributes = pDescription["Attributes"];
+  Json::Value matShader = pDescription["Shader"];
+
+  mat->SetShaderName(matShader["name"].asString());
+  for (int attIdx = 0; attIdx < matAttributes.size(); ++attIdx)
+  {
+    LoadJsonAttribute(*mat, matAttributes[attIdx]);
+  }
+  return mat;
 }
 
 void ModelLoader::LoadJsonAttribute(Material& p_material, Json::Value const& p_value)

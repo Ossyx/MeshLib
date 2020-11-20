@@ -25,7 +25,7 @@ void Model::AddMesh(MeshPtr p_mesh)
   m_meshes.push_back(p_mesh);
 }
 
-void Model::AddMaterial(Material* p_material, std::string const& p_name)
+void Model::AddMaterial(MaterialPtr p_material, std::string const& p_name)
 {
   m_materials[p_name] = p_material;
 }
@@ -41,7 +41,8 @@ Model::MeshPtr Model::GetMesh(unsigned int p_idx)
   return m_meshes[p_idx];
 }
 
-Material* Model::GetMaterial(std::string const& p_name)
+Model::MaterialPtr
+Model::GetMaterial(std::string const& p_name)
 {
   assert(m_materials.find(p_name) != m_materials.end());
   return m_materials[p_name];
@@ -52,7 +53,8 @@ void Model::AddMeshMaterialLink(unsigned int p_meshIdx, std::string const& p_mat
   m_meshToMaterialLink[p_meshIdx] = p_materialName;
 }
 
-Material* Model::GetMaterialForMesh(unsigned int p_meshId)
+Model::MaterialPtr
+Model::GetMaterialForMesh(unsigned int p_meshId)
 {
   assert(p_meshId < m_meshes.size());
   UintStringMap::iterator it = m_meshToMaterialLink.find(p_meshId);
