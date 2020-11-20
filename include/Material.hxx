@@ -278,5 +278,7 @@ private:
   std::string m_shaderName;
 };
 
+using MaterialPtr = std::shared_ptr<Material>;
+
 }
 #endif

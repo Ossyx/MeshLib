@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 #include "Common.hxx"
 
@@ -58,6 +59,8 @@ protected:
   unsigned int m_trianglesCount;
   unsigned int m_uvCoordsCount;
 };
+
+using MeshPtr = std::shared_ptr<Mesh>;
 
 }
 

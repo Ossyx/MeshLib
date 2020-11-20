@@ -28,7 +28,7 @@ ModelLoader::~ModelLoader()
 {
 }
 
-ModelLoader::ModelPtr ModelLoader::LoadOBJModel(
+ModelPtr ModelLoader::LoadOBJModel(
   std::filesystem::path const& p_file,
   std::string const& p_name)
 {
@@ -93,7 +93,7 @@ ModelLoader::ModelPtr ModelLoader::LoadOBJModel(
   return loadedModel;
 }
 
-ModelLoader::MeshPtr ModelLoader::LoadFromAiMesh(aiMesh* p_aiMesh)
+MeshPtr ModelLoader::LoadFromAiMesh(aiMesh* p_aiMesh)
 {
   float* vertexPtr = new float[p_aiMesh->mNumVertices*3];
   unsigned int* triangleIdxPtr = new unsigned int[p_aiMesh->mNumFaces*3];
@@ -190,7 +190,7 @@ ModelLoader::MeshPtr ModelLoader::LoadFromAiMesh(aiMesh* p_aiMesh)
   return m;
 }
 
-std::vector<ModelLoader::MaterialPtr> 
+std::vector<MaterialPtr> 
 ModelLoader::LoadMaterialCollection(std::filesystem::path const& p_jsonFile)
 {
   std::ifstream inputStreamJsonMap;
@@ -238,7 +238,7 @@ ModelLoader::LoadMaterialCollection(std::filesystem::path const& p_jsonFile)
   return result;
 }
 
-ModelLoader::MaterialPtr ModelLoader::LoadMaterial(Json::Value& pDescription, std::string const& pKey, std::filesystem::path const& pDirectory)
+MaterialPtr ModelLoader::LoadMaterial(Json::Value& pDescription, std::string const& pKey, std::filesystem::path const& pDirectory)
 {
   MaterialPtr mat = std::make_shared<Material>();
   mat->SetName(pKey);

@@ -21,9 +21,6 @@ public:
 
   ~Model();
   
-  using MeshPtr = std::shared_ptr<Mesh>;
-  using MaterialPtr = std::shared_ptr<Material>;
-
   void SetName(std::string const& p_name);
 
   void AddMesh(MeshPtr p_mesh);
@@ -60,6 +57,8 @@ private:
   typedef std::map<unsigned int, std::string> UintStringMap;
   UintStringMap m_meshToMaterialLink;
 };
+
+using ModelPtr = std::shared_ptr<Model>;
 
 }
 

@@ -37,10 +37,6 @@ public:
   ModelLoader();
 
   ~ModelLoader();
-  
-  using ModelPtr = std::shared_ptr<rx::Model>;
-  using MeshPtr = std::shared_ptr<rx::Mesh>;
-  using MaterialPtr = std::shared_ptr<rx::Material>;
 
   static ModelPtr LoadOBJModel(std::filesystem::path const& p_file,
     std::string const& p_name);
