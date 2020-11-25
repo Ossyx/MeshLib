@@ -46,7 +46,7 @@ public:
   
   template <typename T>
   static void LoadTextureFromFile(std::filesystem::path const& p_path,
-    Texture<T>& p_texture);
+    Texture<T>& p_texture, bool pYinvert = true);
   
   static std::vector<MaterialPtr> LoadMaterialCollection(std::filesystem::path const& p_jsonFile);
   
@@ -67,6 +67,8 @@ private:
   static void AttributeAsByteTexture(Material& p_material, Json::Value const& p_value);
 
   static void AttributeAsUShortTexture(Material& p_material, Json::Value const& p_value);
+  
+  static void AttributeAsFloatTexture(Material& p_material, Json::Value const& p_value);
 };
 
 }

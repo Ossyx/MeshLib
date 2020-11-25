@@ -34,6 +34,11 @@ struct Texture
     unsigned int p_width, unsigned int p_height,
     T* p_data);
 
+  //RG Texture
+  void Initialize(std::string const& p_filepath,
+    unsigned int p_width, unsigned int p_height,
+    T* p_dataR, T* p_dataB);
+  
   //RGB Textures
   void Initialize(std::string const& p_filepath,
     unsigned int p_width, unsigned int p_height,
@@ -111,6 +116,31 @@ void Texture<T>::Initialize(std::string const& p_filepath,
     m_data[i] = p_data[i];
   }
 }
+
+template <typename T>
+void Texture<T>::Initialize(std::string const& p_filepath,
+  unsigned int p_width, unsigned int p_height,
+  T* p_dataR, T* p_dataG)
+{
+  this->m_filepath = p_filepath;
+  this->m_width = p_width;
+  this->m_height = p_height;
+  this->m_channelCount = 2;
+  if (m_data != NULL)
+  {
+    delete [] m_data;
+  }
+  unsigned int size = m_width*m_height*m_channelCount;
+  m_data = new T[size];
+
+  //Interleave RGB data
+  for (int i = 0; i < m_width*m_height; ++i)
+  {
+    m_data[i*m_channelCount] = p_dataR[i];
+    m_data[i*m_channelCount + 1] = p_dataG[i];
+  }
+}
+
 
 template <typename T>
 void Texture<T>::Initialize(std::string const& p_filepath,

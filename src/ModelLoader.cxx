@@ -214,18 +214,18 @@ ModelLoader::LoadMaterialCollection(std::filesystem::path const& p_jsonFile)
   std::vector<MaterialPtr> result;
 
   //Each thread needs material key, root data and p_model and a mutex for p_model
-  std::mutex model_mutex;
+  std::mutex res_mutex;
   std::vector<std::thread> matThreads;
   std::vector<std::string> const& materialKeys = root.getMemberNames();
   for (int i = 0; i < materialKeys.size(); ++i)
   {
     std::string materialKey = materialKeys[i];
-    auto func = [&model_mutex, materialKey, &root, &result, &p_jsonFile]
+    auto func = [&res_mutex, materialKey, &root, &result, &p_jsonFile]
       {
         MaterialPtr mat = LoadMaterial(root[materialKey], materialKey, p_jsonFile.parent_path());
-        model_mutex.lock();
+        res_mutex.lock();
         result.push_back(mat);
-        model_mutex.unlock();
+        res_mutex.unlock();
       };
     matThreads.push_back(std::thread(func));
   }
@@ -276,6 +276,10 @@ void ModelLoader::LoadJsonAttribute(Material& p_material, Json::Value const& p_v
     {
       AttributeAsUShortTexture(p_material, p_value);
     }
+    else if (attType == "FloatTex")
+    {
+      AttributeAsFloatTexture(p_material, p_value);
+    }
     else
     {
       rxLogError("Unsupported attribute type : "<< attType);
@@ -311,7 +315,7 @@ void ModelLoader::AttributeAsVec3(Material& p_material, Json::Value const& p_val
 void ModelLoader::AttributeAsByteTexture(Material& p_material, Json::Value const& p_value)
 {
   std::string name = p_value["name"].asString();
-  std::string value = p_value["value"].asString();;
+  std::filesystem::path value = p_value["value"].asString();
   rxLogInfo("Loading "<< name <<" texture "<< value);
 
   Texture<unsigned char>& tex = p_material.AddByteTexData(name);
@@ -321,31 +325,54 @@ void ModelLoader::AttributeAsByteTexture(Material& p_material, Json::Value const
 void ModelLoader::AttributeAsUShortTexture(Material& p_material, Json::Value const& p_value)
 {
   std::string name = p_value["name"].asString();
-  std::string value = p_value["value"].asString();;
+  std::filesystem::path value = p_value["value"].asString();
   rxLogInfo("Loading "<< name <<" texture "<< value);
 
   Texture<unsigned short>& tex = p_material.AddUShortTexData(name);
   LoadTextureFromFile<unsigned short>(p_material.GetDirectory() / value, tex);
 }
 
+void ModelLoader::AttributeAsFloatTexture(Material& p_material, Json::Value const& p_value)
+{
+  std::string name = p_value["name"].asString();
+  std::filesystem::path value = p_value["value"].asString();
+  bool yinvert = false;
+  if( p_value.isMember("yinvert") )
+  {
+    yinvert = p_value["yinvert"].asBool();
+  }
+  rxLogInfo("Loading "<< name <<" texture "<< value);
+
+  Texture<float>& tex = p_material.AddFloatTexData(name);
+  LoadTextureFromFile<float>(p_material.GetDirectory() / value, tex, yinvert);
+}
+
 template <typename T>
 void ModelLoader::LoadTextureFromFile(std::filesystem::path const& p_path,
-  Texture<T>& p_texture)
+  Texture<T>& p_texture, bool pYinvert)
 {
-  cimg::CImg<T> image(p_path.c_str());
-  image.mirror('y');
+  cimg::CImg<T> image(p_path.c_str());  
+  if ( pYinvert )
+  {
+    image.mirror('y');
+  }
   rxLogInfo("Loading "<<p_path<<" with spectrum " << image.spectrum());
 //   cimg::CImgDisplay main_disp(image,"Click a point");
 //   while (!main_disp.is_closed()) {
 //     main_disp.wait();
 //   }
   unsigned int pixelCount = image.width() * image.height();
-  assert(image.spectrum() == 1 || image.spectrum() == 3 || image.spectrum() == 4);
   if (image.spectrum() == 1)//B&W
   {
     p_texture.Initialize(p_path, (unsigned int)image.width(),
      (unsigned int)image.height(),
      image.data());
+  }
+  else if (image.spectrum() == 2)//RG
+  {
+    p_texture.Initialize(p_path, (unsigned int)image.width(),
+     (unsigned int)image.height(),
+     image.data(), image.data(pixelCount));
   }
   else if (image.spectrum() == 3)//RGB
   {
