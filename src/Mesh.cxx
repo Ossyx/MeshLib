@@ -14,10 +14,11 @@ Mesh::Mesh()
 {
 }
 
-Mesh::Mesh(float* p_vPtr, float* p_nPtr, unsigned int* p_tIdPtr, float* p_uvCoords,
-  float* p_tangentPtr, float* p_bitangentPtr, unsigned int p_vertexCount,
+Mesh::Mesh(std::string const& p_name, float* p_vPtr, float* p_nPtr, unsigned int* p_tIdPtr,
+  float* p_uvCoords,  float* p_tangentPtr, float* p_bitangentPtr, unsigned int p_vertexCount,
   unsigned int p_normalCount, unsigned int p_tangentCount, unsigned int p_bitangentCount,
   unsigned int p_trianglesCount, unsigned int p_uvCoordsCount):
+  m_name(p_name),
   m_vertices(p_vPtr),
   m_normals(p_nPtr),
   m_triangles(p_tIdPtr),
@@ -140,5 +141,16 @@ bool Mesh::HasUVCoords() const
 {
   return m_uvCoords != NULL;
 }
+
+std::string Mesh::GetName() const
+{
+  return m_name;
+}
+
+void Mesh::SetName(const std::string& p_name)
+{
+  m_name = p_name;
+}
+
 
 }

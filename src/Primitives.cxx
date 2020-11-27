@@ -6,6 +6,7 @@ namespace rx
 
 Square::Square()
 {
+  m_name = "square";
   m_vertices = new float[4*3];
   m_triangles = new unsigned[2*3];
   m_normals = new float[4*3];
@@ -41,6 +42,7 @@ Square::~Square()
 
 Cube::Cube()
 {
+  m_name = "cube";
   //Create a unit cube with 24 vertex (4*6faces)
   m_vertices = new float[24*3];
   m_triangles = new unsigned[3*12];

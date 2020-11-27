@@ -84,6 +84,13 @@ ModelPtr ModelLoader::LoadOBJModel(
       <<scene->mMeshes[meshIdx]->mNumVertices<<" vertices "
       <<"and "<<scene->mMeshes[meshIdx]->mNumFaces<<" faces.");
     MeshPtr mesh = LoadFromAiMesh(scene->mMeshes[meshIdx]);
+    
+    if( mesh->GetName() == "" )
+    {
+      std::string genName = loadedModel->GetName() + "_" + std::to_string(meshIdx);
+      mesh->SetName(genName);
+    }
+    
     loadedModel->AddMesh(mesh);
     loadedModel->AddMeshMaterialLink(meshIdx,
       materialMapping[scene->mMeshes[meshIdx]->mMaterialIndex]);
@@ -183,7 +190,9 @@ MeshPtr ModelLoader::LoadFromAiMesh(aiMesh* p_aiMesh)
     idx += 3;
   }
   
-  auto m = std::make_shared<Mesh>(vertexPtr, normalPtr, triangleIdxPtr, uvCoordsPtr, tangentPtr,
+  std::string name = p_aiMesh->mName.C_Str();
+  
+  auto m = std::make_shared<Mesh>(name, vertexPtr, normalPtr, triangleIdxPtr, uvCoordsPtr, tangentPtr,
     bitangentPtr,p_aiMesh->mNumVertices, p_aiMesh->mNumVertices, p_aiMesh->mNumVertices,
     p_aiMesh->mNumVertices, p_aiMesh->mNumFaces, p_aiMesh->mNumVertices);
 
