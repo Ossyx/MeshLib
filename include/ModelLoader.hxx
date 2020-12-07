@@ -43,11 +43,7 @@ public:
 
   static void ComputeNormalMap(cimg_library::CImg<unsigned char> const& p_bumpMap,
     Texture<unsigned char>& p_normalMap);
-  
-  template <typename T>
-  static void LoadTextureFromFile(std::filesystem::path const& p_path,
-    Texture<T>& p_texture, bool pYinvert = true);
-  
+ 
   static std::vector<MaterialPtr> LoadMaterialCollection(std::filesystem::path const& p_jsonFile);
   
   static MaterialPtr LoadMaterial(Json::Value& pDescription, std::string const& pKey, std::filesystem::path const& pDirectory);
@@ -63,13 +59,26 @@ private:
   static void AttributeAsFloat(Material& p_material, Json::Value const& p_value);
 
   static void AttributeAsVec3(Material& p_material, Json::Value const& p_value);
-
-  static void AttributeAsByteTexture(Material& p_material, Json::Value const& p_value);
-
-  static void AttributeAsUShortTexture(Material& p_material, Json::Value const& p_value);
   
-  static void AttributeAsFloatTexture(Material& p_material, Json::Value const& p_value);
+  template <typename T>
+  static void AttributeAsTexture(Material& p_material, Json::Value const& p_value);
 };
+
+template <typename T>
+void ModelLoader::AttributeAsTexture(Material& p_material, Json::Value const& p_value)
+{
+  std::string name = p_value["name"].asString();
+  std::filesystem::path value = p_value["value"].asString();
+  bool yinvert = true;
+  if( p_value.isMember("yinvert") )
+  {
+    yinvert = p_value["yinvert"].asBool();
+  }
+  rxLogInfo("Loading "<< name <<" texture "<< value);
+
+  auto tex = TextureFactory::Create<T>(p_material.GetDirectory() / value, yinvert);
+  p_material.SetData(name, tex);
+}
 
 }
 

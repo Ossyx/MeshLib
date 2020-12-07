@@ -30,6 +30,7 @@ install(FILES ${headers} DESTINATION include)
 
 add_library(MeshLib SHARED
   ${CMAKE_SOURCE_DIR}/src/Mesh.cxx
+  ${CMAKE_SOURCE_DIR}/src/GLSLTypeStore.cxx
   ${CMAKE_SOURCE_DIR}/src/Material.cxx
   ${CMAKE_SOURCE_DIR}/src/Model.cxx
   ${CMAKE_SOURCE_DIR}/src/ModelLoader.cxx
