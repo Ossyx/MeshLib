@@ -36,48 +36,20 @@ void Material::SetDirectory(const std::filesystem::path& p_path)
 
 void Material::SetData(std::string const& p_name, Material::ByteTexture p_data)
 {
+  mMembers.insert(p_name);
   m_ucharTextures[p_name] = p_data;
 }
 
 void Material::SetData(std::string const& p_name, Material::FloatTexture p_data)
 {
+  mMembers.insert(p_name);
   m_floatTextures[p_name] = p_data;
 }
 
 void Material::SetData(std::string const& p_name, Material::UShortTexture p_data)
 {
+  mMembers.insert(p_name);
   m_ushortTextures[p_name] = p_data;
-}
-
-void Material::SetUniformData(std::string const& p_uniform, std::string const& p_attributeKey)
-{
-  m_uniforms[p_uniform] = p_attributeKey;
-}
-
-void Material::SetShaderName(std::string const& p_name)
-{
-  m_shaderName = p_name;
-}
-
-bool Material::GetUniformData(std::string const& p_uniform, std::string& p_attributeKey) const
-{
-  StringMap::const_iterator it = m_uniforms.find(p_uniform);
-  if (it != m_uniforms.cend())
-  {
-    p_attributeKey = it->second;
-    return true;
-  }
-  return false;
-}
-
-Material::StringMap const& Material::GetUniforms() const
-{
-  return m_uniforms;
-}
-
-std::string Material::GetShaderName() const
-{
-  return m_shaderName;
 }
 
 template <>

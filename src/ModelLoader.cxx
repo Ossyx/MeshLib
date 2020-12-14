@@ -253,9 +253,6 @@ MaterialPtr ModelLoader::LoadMaterial(Json::Value& pDescription, std::string con
   mat->SetName(pKey);
   mat->SetDirectory(pDirectory);
   Json::Value matAttributes = pDescription["Attributes"];
-  Json::Value matShader = pDescription["Shader"];
-
-  mat->SetShaderName(matShader["name"].asString());
   for (int attIdx = 0; attIdx < matAttributes.size(); ++attIdx)
   {
     LoadJsonAttribute(*mat, matAttributes[attIdx]);
@@ -294,11 +291,6 @@ void ModelLoader::LoadJsonAttribute(Material& p_material, Json::Value const& p_v
       rxLogError("Unsupported attribute type : "<< attType);
       assert(false);
     }
-  }
-
-  if (p_value.isMember("uniform"))
-  {
-    p_material.SetUniformData(p_value["uniform"].asString(), p_value["name"].asString());
   }
 }
 

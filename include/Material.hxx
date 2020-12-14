@@ -35,8 +35,7 @@ public:
 
   void SetName(std::string const& p_name);
   
-  void SetDirectory(std::filesystem::path const& p_path);
-   
+  void SetDirectory(std::filesystem::path const& p_path);   
 
   void SetData(std::string const& p_name, ByteTexture p_data);
 
@@ -44,22 +43,12 @@ public:
 
   void SetData(std::string const& p_name, UShortTexture p_data);
 
-  void SetUniformData(std::string const& p_uniform, std::string const& p_attributeKey);
-
-  void SetShaderName(std::string const& p_name);
-
   std::string GetName() const;
   
   std::filesystem::path GetDirectory() const;
   
   template <typename T>
   std::shared_ptr<Texture<T>> GetTextureData(std::string const& pName) const;
-
-  bool GetUniformData(std::string const& p_uniform, std::string& p_attributeKey) const;
-
-  StringMap const& GetUniforms() const;
-
-  std::string GetShaderName() const;
   
   template <typename T>
   bool HasTextureData(std::string const& pName) const;
@@ -78,10 +67,6 @@ private:
 
   typedef std::unordered_map<std::string, UShortTexture>  UShortTextureMap;
   UShortTextureMap m_ushortTextures;
-
-  StringMap m_uniforms;
-
-  std::string m_shaderName;
 };
 
 using MaterialPtr = std::shared_ptr<Material>;
