@@ -8,13 +8,14 @@
 #include <map>
 
 #include "Common.hxx"
+#include "MeshLibEXPORT.hxx"
 #include "Mesh.hxx"
 #include "Material.hxx"
 
 namespace rx
 {
 
-class Model
+class MeshLib_EXPORT Model
 {
 public:
   Model();

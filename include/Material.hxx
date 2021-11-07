@@ -13,6 +13,7 @@
 #include <glm/vec3.hpp> // glm::vec3
 #include <glm/vec4.hpp> // glm::vec4
 
+#include "MeshLibEXPORT.hxx"
 #include "Common.hxx"
 #include "GLSLTypeStore.hxx"
 #include "Texture.hxx"
@@ -20,7 +21,7 @@
 namespace rx
 {
 
-class Material : public GLSLTypeStore
+class MeshLib_EXPORT Material : public GLSLTypeStore
 {
 public:
 

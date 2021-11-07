@@ -10,10 +10,12 @@
 
 #include "Common.hxx"
 
+#include "MeshLibEXPORT.hxx"
+
 namespace rx
 {
 
-class Mesh
+class MeshLib_EXPORT Mesh
 {
 public:
   Mesh();

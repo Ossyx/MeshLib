@@ -15,8 +15,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include <jsoncpp/json/value.h>
-#include <jsoncpp/json/reader.h>
+#include <json/value.h>
+#include <json/reader.h>
 
 #define cimg_use_png
 #define cimg_use_jpeg
@@ -26,11 +26,12 @@
 #include "Material.hxx"
 #include "Model.hxx"
 #include "Common.hxx"
+#include "MeshLibEXPORT.hxx"
 
 namespace rx
 {
 
-class ModelLoader
+class MeshLib_EXPORT ModelLoader
 {
 public:
 
