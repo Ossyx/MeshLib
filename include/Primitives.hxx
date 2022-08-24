@@ -2,11 +2,12 @@
 #define PRIMITIVES_HXX
 
 #include "Mesh.hxx"
+#include "MeshLibEXPORT.hxx"
 
 namespace rx
 {
 
-class Square : public Mesh
+class MeshLib_EXPORT Square : public Mesh
 {
 public:
   Square();
@@ -14,14 +15,14 @@ public:
 };
 
 
-class Cube : public Mesh
+class MeshLib_EXPORT Cube : public Mesh
 {
 public:
   Cube();
   virtual ~Cube();
 };
 
-class Sphere : public Mesh
+class MeshLib_EXPORT Sphere : public Mesh
 {
 public:
   Sphere();

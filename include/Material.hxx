@@ -27,7 +27,7 @@ public:
 
   Material();
 
-  ~Material();
+  virtual ~Material();
 
   typedef std::shared_ptr<Texture<unsigned char>> ByteTexture;
   typedef std::shared_ptr<Texture<float>> FloatTexture;

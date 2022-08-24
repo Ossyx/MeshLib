@@ -73,7 +73,7 @@ add_library(MeshLib SHARED
 
 target_include_directories(MeshLib PUBLIC ${Assimp_DIR})
 target_include_directories(MeshLib PUBLIC ${CImg_DIR})
-target_link_libraries(MeshLib PUBLIC CImg::CImg png assimp::assimp jsoncpp_lib glm::glm) 
+target_link_libraries(MeshLib PUBLIC CImg::CImg png assimp::assimp jsoncpp_lib glm::glm JPEG::JPEG) 
 
 #install(TARGETS MeshLib DESTINATION lib)
 
@@ -95,7 +95,7 @@ file(GLOB_RECURSE srcs
 #  ${srcs})
 
 set_target_properties(MeshLib PROPERTIES
-  PUBLIC_HEADER "include/Common.hxx;include/Material.hxx;include/Mesh.hxx;include/Model.hxx;include/ModelLoader.hxx;include/MeshLibEXPORT.hxx")
+  PUBLIC_HEADER "include/Common.hxx;include/Material.hxx;include/Mesh.hxx;include/Model.hxx;include/ModelLoader.hxx;include/MeshLibEXPORT.hxx;include/GLSLTypeStore.hxx;include/Texture.hxx;include/Primitives.hxx")
 
 #Install stuff
 install(TARGETS MeshLib
@@ -105,6 +105,8 @@ install(TARGETS MeshLib
   ARCHIVE DESTINATION "${INSTALL_LIB_DIR}" COMPONENT lib
   PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/MeshLib"
     COMPONENT dev)
+
+#install(TARGETS MeshLib RUNTIME_DEPENDENCIES RUNTIME DESTINATION "${INSTALL_BIN_DIR}" COMPONENT bin)
 
 # Add all targets to the build-tree export set
 export(TARGETS MeshLib

@@ -37,7 +37,7 @@ ModelPtr ModelLoader::LoadOBJModel(
   flag |= aiProcess_JoinIdenticalVertices;
   flag |= aiProcess_CalcTangentSpace;
   
-  const aiScene* scene = aiImportFile(p_file.c_str(), flag);
+  const aiScene* scene = aiImportFile(p_file.generic_string().c_str(), flag);
 
   if (scene == NULL)
   {

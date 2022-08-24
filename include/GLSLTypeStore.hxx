@@ -9,11 +9,12 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 #include "Common.hxx"
+#include "MeshLibEXPORT.hxx"
 
 namespace rx
 {
 
-class GLSLTypeStore
+class MeshLib_EXPORT GLSLTypeStore
 {
 public:
   
@@ -31,7 +32,7 @@ public:
   void Set(std::string const& pKey, T pValue);
   
   MemberSet const& GetMembers() const;
-  
+ 
 protected:
   
   std::unordered_map<std::string, int> mInts;

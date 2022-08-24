@@ -208,7 +208,7 @@ Texture<T>::Texture(Texture<T> const& p_other)
 template <typename T>
 std::shared_ptr<Texture<T>> TextureFactory::Create(std::filesystem::path const& pPath, bool pYinvert)
 {
-  cimg::CImg<T> image(pPath.c_str());  
+  cimg::CImg<T> image(pPath.generic_string().c_str());  
   if ( pYinvert )
   {
     image.mirror('y');
@@ -223,25 +223,25 @@ std::shared_ptr<Texture<T>> TextureFactory::Create(std::filesystem::path const& 
   unsigned int pixelCount = image.width() * image.height();
   if (image.spectrum() == 1)//B&W
   {
-    tex->Initialize(pPath, (unsigned int)image.width(),
+    tex->Initialize(pPath.generic_string(), (unsigned int)image.width(),
      (unsigned int)image.height(),
      image.data());
   }
   else if (image.spectrum() == 2)//RG
   {
-    tex->Initialize(pPath, (unsigned int)image.width(),
+    tex->Initialize(pPath.generic_string(), (unsigned int)image.width(),
      (unsigned int)image.height(),
      image.data(), image.data(pixelCount));
   }
   else if (image.spectrum() == 3)//RGB
   {
-    tex->Initialize(pPath, (unsigned int)image.width(),
+    tex->Initialize(pPath.generic_string(), (unsigned int)image.width(),
      (unsigned int)image.height(),
      image.data(), image.data(pixelCount), image.data(2*pixelCount));
   }
   else if(image.spectrum() == 4)//RGBA
   {
-    tex->Initialize(pPath, (unsigned int)image.width(),
+    tex->Initialize(pPath.generic_string(), (unsigned int)image.width(),
      (unsigned int)image.height(),
      image.data(), image.data(pixelCount),
      image.data(2*pixelCount), image.data(3*pixelCount));
