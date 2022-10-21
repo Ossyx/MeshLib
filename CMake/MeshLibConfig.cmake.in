@@ -2,13 +2,12 @@
 # It defines the following variables
 #  MeshLib_INCLUDE_DIRS - include directories for FooBar
 #  MeshLib_LIBRARIES    - libraries to link against
-
 # Compute paths
 get_filename_component(MeshLib_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 set(MeshLib_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
 
 # Our library dependencies (contains definitions for IMPORTED targets)
-if(NOT TARGET foo AND NOT MeshLib_BINARY_DIR)
+if(NOT TARGET MeshLib AND NOT MeshLib_BINARY_DIR)
   include("${MeshLib_CMAKE_DIR}/MeshLibTargets.cmake")
 endif()
 
